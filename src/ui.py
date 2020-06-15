@@ -105,7 +105,8 @@ class MenuPage(tk.Frame):
             widget.config(bg="white", image=self.no_cup)
             self.button_flag[pos] = False
         else:
-            widget.config(bg="green", image=self.cup)
+            widget.config(bg="white", image=self.cup)
+
             self.button_flag[pos] = True
 
 

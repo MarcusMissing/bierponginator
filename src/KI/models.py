@@ -2,6 +2,8 @@ import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv2D, GlobalAveragePooling2D, Dropout
 from tensorflow.keras.layers import Activation, BatchNormalization, Add, Reshape, DepthwiseConv2D, Dense
+from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2
+
 from keras.utils.vis_utils import plot_model
 
 from keras import backend as K
@@ -156,10 +158,9 @@ def MobileNetv2(input_shape, k, alpha=1.0):
     return model
 
 
-from keras.applications.mobilenet_v2 import MobileNetV2
 
+def make_model(input_shape=(128, 128, 3), output_shape: int = 10):
 
-def make_model(input_shape):
     # model = tf.keras.models.Sequential()
     # tf.keras.layers.Input(shape=input_shape)
     base_net = MobileNetV2(include_top=False, weights="imagenet", input_shape=input_shape)
@@ -167,7 +168,9 @@ def make_model(input_shape):
     model_layer = base_net.output
     model_layer = tf.keras.layers.GlobalAveragePooling2D()(model_layer)
     model_layer = tf.keras.layers.Dense(256)(model_layer)
-    output = tf.keras.layers.Dense(10, activation="softmax")(model_layer)
+
+    output = tf.keras.layers.Dense(output_shape, activation="softmax")(model_layer)
+
 
     for layer in MobileNetV2.layers[:10]:
         layer.trainable = False
