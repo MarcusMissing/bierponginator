@@ -4,7 +4,7 @@ from keras.models import load_model
 from keras.preprocessing.image import img_to_array
 
 model = load_model('../resource/model.h5')
-X = np.load('../resource/preprocessed_images_128.npz')['X']
+X = np.load('../../resource/preprocessed_images_128.npz')['X']
 
 loaded_image = X.__getitem__(500)  # insert number of test image here!
 image = img_to_array(loaded_image)
