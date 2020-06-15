@@ -1,0 +1,7 @@
+.vscode/
+.idea/
+.DS_Store/
+resource/bilder_lables/
+resource/*.npz
+src/__pycache__/
+resource/model.h5
