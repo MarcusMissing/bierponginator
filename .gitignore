@@ -4,6 +4,7 @@
 resource/bilder_lables/
 resource/checkpoints/*.h5
 resource/tensorboard/train/
+resource/tensorboard/validation/
 resource/images/
 resource/*.npz
 src/__pycache__/
