@@ -3,11 +3,16 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 from KI import config
+import random
+import os
 
 paths = []
-paths.extend([str(p) for p in Path("resource/images/images_labeled").rglob("*" + ".jpg")])
+img_path = os.path.join("resource", "images", "images_labeled")
+paths.extend([str(p) for p in Path(img_path).rglob("*" + ".jpg")])
 X = np.empty((len(paths) * 3, *config.image_size_0))
-y = np.zeros((len(paths)*3, 10))
+y = np.zeros((len(paths) * 3, 10))
+random.seed = 49
+random.shuffle(paths)
 
 for j, ID in tqdm(enumerate(paths)):
     img_full = cv2.imread(ID)
@@ -40,4 +45,9 @@ for j, ID in tqdm(enumerate(paths)):
         y[j + len(paths) * 2, k] = np.array(y_label[k], dtype="float64")
 
 # ---------------- save as npz ----------------
-np.savez_compressed('resource/preprocessed_images_128_new.npz', y=y, X=X)
+train_split = len(X) - int(config.train_test_split * len(X))
+file_name = "preprocessed_images" + str(config.image_size_0[0])
+npz_path = os.path.join("resource", "images", "compressed", file_name)
+np.savez_compressed(npz_path, y_train=y[0:train_split],
+                    y_test=y[train_split + 1:len(X)], X_train=X[0:train_split],
+                    X_test=X[train_split + 1:len(X)])
