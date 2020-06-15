@@ -1,6 +1,8 @@
 import sys
 import tkinter as tk
 
+import numpy as np
+
 font = ('Comic Sans MS', 36, 'bold')
 
 
@@ -17,7 +19,7 @@ class MainFrame(tk.Tk):
 
         self.frames = {}
 
-        for F in (MenuPage, PageOne, PageTwo, PageThree, PageFour, PageFive, Console):
+        for F in (MenuPage, Start, Calibrate, Difficulty, PageFour, Console):
             frame = F(container, self)
 
             self.frames[F] = frame
@@ -39,16 +41,55 @@ class MenuPage(tk.Frame):
         tk.Grid.columnconfigure(self, 2, weight=1)
         tk.Grid.rowconfigure(self, 1, weight=1)
 
-        tk.Button(self, text='btn1', font=font, command=lambda: controller.show_frame(PageOne)).grid(
+        tk.Button(self, text='Start/Stop', font=font, command=lambda: controller.show_frame(Start)).grid(
             column=0, row=0, sticky='nsew')
-        tk.Button(self, text='btn2', font=font, command=lambda: controller.show_frame(PageTwo)).grid(
+        tk.Button(self, text='Calibrate', font=font, command=lambda: controller.show_frame(Calibrate)).grid(
             column=0, row=1, sticky='nsew')
-        tk.Button(self, text='btn3', font=font, command=lambda: controller.show_frame(PageThree)).grid(
+        tk.Button(self, text='Difficulty', font=font, command=lambda: controller.show_frame(Difficulty)).grid(
             column=1, row=0, sticky='nsew')
-        tk.Button(self, text='btn4', font=font, command=lambda: controller.show_frame(PageFour)).grid(
+        tk.Button(self, text='Reset?', font=font, command=lambda: controller.show_frame(PageFour)).grid(
             column=1, row=1, sticky='nsew')
-        tk.Button(self, text='btn5', font=font, command=lambda: controller.show_frame(PageFive)).grid(
-            column=2, row=0, sticky='nsew')
+
+        button_frame = tk.Frame(self)
+        button_frame.grid(column=2, row=0, sticky='nsew')
+        self.cup = tk.PhotoImage(file="../resource/cup.png")
+        self.no_cup = tk.PhotoImage(file="../resource/no_cup.png")
+
+        self.button_flag = np.array([True, True, True, True, True, True, True, True, True, True], dtype=bool)
+
+        x_shift = 5
+        y_shift = -15
+
+        self.button0 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button0, 0))
+        self.button0.place(in_=button_frame, x=x_shift+95, y=y_shift+185)
+
+        self.button1 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button1, 1))
+        self.button1.place(in_=button_frame, x=x_shift+70, y=y_shift+135)
+
+        self.button2 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button2, 2))
+        self.button2.place(in_=button_frame, x=x_shift+120, y=y_shift+135)
+
+        self.button3 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button3, 3))
+        self.button3.place(in_=button_frame, x=x_shift+45, y=y_shift+85)
+
+        self.button4 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button4, 4))
+        self.button4.place(in_=button_frame, x=x_shift+95, y=y_shift+85)
+
+        self.button5 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button5, 5))
+        self.button5.place(in_=button_frame, x=x_shift+145, y=y_shift+85)
+
+        self.button6 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button6, 6))
+        self.button6.place(in_=button_frame, x=x_shift+15, y=y_shift+35)
+
+        self.button7 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button7, 7))
+        self.button7.place(in_=button_frame, x=x_shift+65, y=y_shift+35)
+
+        self.button8 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button8, 8))
+        self.button8.place(in_=button_frame, x=x_shift+115, y=y_shift+35)
+
+        self.button9 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button9, 9))
+        self.button9.place(in_=button_frame, x=x_shift+165, y=y_shift+35)
+
         tk.Button(self, text='Console', font=font, command=lambda: controller.show_frame(Console)).grid(
             column=2, row=1, sticky='nsew')
 
@@ -58,8 +99,17 @@ class MenuPage(tk.Frame):
         for y in range(1):
             tk.Grid.rowconfigure(self, y, weight=1)
 
+    def click(self, widget, pos):
+        self.button_flag[pos]
+        if self.button_flag[pos]:
+            widget.config(bg="white", image=self.no_cup)
+            self.button_flag[pos] = False
+        else:
+            widget.config(bg="white", image=self.cup)
+            self.button_flag[pos] = True
 
-class PageOne(tk.Frame):
+
+class Start(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -69,7 +119,7 @@ class PageOne(tk.Frame):
         tk.Button(self, text='Back to Home', command=lambda: controller.show_frame(MenuPage)).pack()
 
 
-class PageTwo(tk.Frame):
+class Calibrate(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -89,7 +139,7 @@ class PageTwo(tk.Frame):
         tk.Button(self, text='Back to Home', command=lambda: controller.show_frame(MenuPage)).pack()
 
 
-class PageThree(tk.Frame):
+class Difficulty(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -104,16 +154,6 @@ class PageFour(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text='Page Four!!!', font=font)
-        label.pack(pady=10, padx=10)
-
-        tk.Button(self, text='Back to Home', command=lambda: controller.show_frame(MenuPage)).pack()
-
-
-class PageFive(tk.Frame):
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text='Page Five!!!', font=font)
         label.pack(pady=10, padx=10)
 
         tk.Button(self, text='Back to Home', command=lambda: controller.show_frame(MenuPage)).pack()
@@ -152,6 +192,7 @@ class TextRedirector(object):
     def write(self, str):
         self.widget.configure(state='normal')
         self.widget.insert('end', str, (self.tag,))
+        self.widget.see("end")
         self.widget.configure(state='disabled')
 
 

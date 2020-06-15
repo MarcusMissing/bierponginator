@@ -10,7 +10,7 @@ def label_img():
     dataset = "bilder"
     paths.extend([str(p) for p in Path(dataset).rglob("*" + ".jpg")])
 
-    with open('../resource/cup_placement.txt') as f:
+    with open('../../resource/cup_placement.txt') as f:
         mainlist = [list(literal_eval(line)) for line in f]
 
     for label in mainlist:
