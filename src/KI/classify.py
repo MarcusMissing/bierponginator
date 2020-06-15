@@ -30,3 +30,4 @@ for i, j in enumerate(score):
     img = cv2.resize(X_test[i,], (500, 500))
     cv2.imshow('image', img)
     cv2.waitKey(0)
+
