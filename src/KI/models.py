@@ -158,7 +158,9 @@ def MobileNetv2(input_shape, k, alpha=1.0):
     return model
 
 
+
 def make_model(input_shape=(128, 128, 3), output_shape: int = 10):
+
     # model = tf.keras.models.Sequential()
     # tf.keras.layers.Input(shape=input_shape)
     base_net = MobileNetV2(include_top=False, weights="imagenet", input_shape=input_shape)
@@ -166,7 +168,9 @@ def make_model(input_shape=(128, 128, 3), output_shape: int = 10):
     model_layer = base_net.output
     model_layer = tf.keras.layers.GlobalAveragePooling2D()(model_layer)
     model_layer = tf.keras.layers.Dense(256)(model_layer)
+
     output = tf.keras.layers.Dense(output_shape, activation="softmax")(model_layer)
+
 
     for layer in MobileNetV2.layers[:10]:
         layer.trainable = False
