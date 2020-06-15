@@ -2,7 +2,7 @@ from keras.layers import Activation, Dropout, Flatten, Dense, BatchNormalization
 from keras.layers import Conv2D, MaxPooling2D
 from keras.models import Sequential
 
-import config
+from KI import config
 
 model = Sequential()
 model.add(Conv2D(32, (3, 3), input_shape=config.image_size_0))

@@ -1,7 +1,8 @@
 import numpy as np
 import tensorflow as tf
 
-import model_base, config
+from KI import model_base, config
+
 #test
 if __name__ == '__main__':
     image_size = config.image_size_0

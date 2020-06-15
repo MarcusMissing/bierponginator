@@ -3,7 +3,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-import config
+from KI import config
 
 paths = []
 paths.extend([str(p) for p in Path("resource/bilder_labeles").rglob("*" + ".jpg")])
