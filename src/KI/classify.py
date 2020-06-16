@@ -41,13 +41,12 @@ def live_classify(model, fps):
         pred_str_1 = "    [" + str(np.round(score[0, 0],2)) + "]"
         pred_str_2 = "   " + str(np.round(score[0, 1:3],2))
         pred_str_3 = " " + str(np.round(score[0, 3:6],2))
-        pred_str_4 = "" + str(np.round(score[0, 6:10],2))
+        pred_str_4 = "" + str(np.round(score[0, 6:],2))
 
         cv2.putText(img_big, pred_str_1, (700, 800), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
         cv2.putText(img_big, pred_str_2, (700, 850), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
         cv2.putText(img_big, pred_str_3, (700, 900), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
         cv2.putText(img_big, pred_str_4, (700, 950), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
-
 
         cv2.putText(img_big, "Press 0 to terminate", (40, 40), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
         cv2.imshow('camera output', img_big)
