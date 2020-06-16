@@ -19,7 +19,7 @@ def capture_img(frames_per_gesture: int, gestures: int, resolution: tuple = (100
                 # X[j + frames_per_gesture * i,:] = np.array(cv2.resize(img, resolution))
                 # y[j + frames_per_gesture * i,:] = i
                 time.sleep(0.8)
-                filename = "gesture." + str(i) + "." + str(j) + ".png"
+                filename = "gesture." + str(3) + "." + str(j) + ".png"
                 img_name = os.path.join("resource", "images", "gestures", filename)
                 cv2.imwrite(img_name, img)
                 cv2.imshow('camera output', img)
@@ -43,4 +43,4 @@ def capture_img(frames_per_gesture: int, gestures: int, resolution: tuple = (100
 
 
 if __name__ == '__main__':
-    capture_img(frames_per_gesture=100, gestures=3)
+    capture_img(frames_per_gesture=100, gestures=1)
