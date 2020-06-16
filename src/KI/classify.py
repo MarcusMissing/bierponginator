@@ -32,12 +32,24 @@ def live_classify(model, fps):
         img = cv2.resize(img_full, config.image_size_0[0:2])
         temp[0, :] = img
         score = model.predict(temp)
-        img_big = cv2.resize(img_full, (1000,1000))
+        img_big = cv2.resize(img_full, (1000, 1000))
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(img_big, str(np.round(score,2)), (20, 950), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
-        cv2.putText(img_big, "current NN input resolution: " + str(config.image_size_0), (40, 80), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
-        cv2.putText(img_big, "Press 0 to terminate", (40, 40), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
+        #cv2.putText(img_big, str(np.round(score, 2)), (20, 950), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
+        cv2.putText(img_big, "current NN input resolution: " + str(config.image_size_0), (40, 80), font, 0.8,
+                     (0, 255, 0), 2, cv2.LINE_AA)
 
+        pred_str_1 = "    [" + str(np.round(score[0, 0],2)) + "]"
+        pred_str_2 = "   " + str(np.round(score[0, 1:3],2))
+        pred_str_3 = " " + str(np.round(score[0, 3:6],2))
+        pred_str_4 = "" + str(np.round(score[0, 6:10],2))
+
+        cv2.putText(img_big, pred_str_1, (700, 800), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
+        cv2.putText(img_big, pred_str_2, (700, 850), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
+        cv2.putText(img_big, pred_str_3, (700, 900), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
+        cv2.putText(img_big, pred_str_4, (700, 950), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
+
+
+        cv2.putText(img_big, "Press 0 to terminate", (40, 40), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
         cv2.imshow('camera output', img_big)
         k = cv2.waitKey(10)
         if k == 48:
