@@ -7,10 +7,10 @@ import random
 import os
 
 paths = []
-img_path = os.path.join("resource", "images", "images_labeled")
-paths.extend([str(p) for p in Path(img_path).rglob("*" + ".jpg")])
+img_path = os.path.join("resource", "images", "gestures")
+paths.extend([str(p) for p in Path(img_path).rglob("*" + ".png")])
 X = np.empty((len(paths) * 3, *config.image_size_0))
-y = np.zeros((len(paths) * 3, 10))
+y = np.zeros((len(paths) * 3))
 random.seed = 49
 random.shuffle(paths)
 
@@ -37,16 +37,16 @@ for j, ID in tqdm(enumerate(paths)):
     img_gauss = img + gauss
     X[j + len(paths),] = img_gauss
 
-    y_label = ID.split(".")[0]
-    y_label = y_label[-10:]
-    for k in range(10):
-        y[j, k] = np.array(y_label[k], dtype="float64")
-        y[j + len(paths), k] = np.array(y_label[k], dtype="float64")
-        y[j + len(paths) * 2, k] = np.array(y_label[k], dtype="float64")
+    y_label = ID.split(".")[-3]
+    #y_label = y_label[-10:]
+    #for k in range(10):
+    y[j] = np.array(y_label, dtype="int")
+    y[j + len(paths)] = np.array(y_label, dtype="int")
+    y[j + len(paths) * 2] = np.array(y_label, dtype="int")
 
 # ---------------- save as npz ----------------
 train_split = len(X) - int(config.train_test_split * len(X))
-file_name = "preprocessed_images" + str(config.image_size_0[0])
+file_name = "preprocessed_images_gestures" + str(config.image_size_0[0])
 npz_path = os.path.join("resource", "images", "compressed", file_name)
 np.savez_compressed(npz_path, y_train=y[0:train_split],
                     y_test=y[train_split + 1:len(X)], X_train=X[0:train_split],
