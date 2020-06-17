@@ -16,6 +16,14 @@ possibilities = [[i, j, k, l, m, n, o, p, q, r] for r in range(2)
                  for i in range(2)]
 
 
+def combine_funcs(*funcs):
+    def combined_func(*args, **kwargs):
+        for f in funcs:
+            f(*args, **kwargs)
+
+    return combined_func
+
+
 class MainFrame(tk.Tk):
 
     def __init__(self, *args, **kwargs):
@@ -26,6 +34,8 @@ class MainFrame(tk.Tk):
 
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
+
+        self.difficulty = 1
 
         self.frames = {}
 
@@ -42,11 +52,18 @@ class MainFrame(tk.Tk):
         frame = self.frames[cont]
         frame.tkraise()
 
+    def set_difficulty(self, difficulty):
+        self.difficulty = difficulty
+
+    def get_difficulty(self):
+        return self.difficulty
+
 
 class MenuPage(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+        self.controller = controller
 
         tk.Grid.columnconfigure(self, 2, weight=1)
         tk.Grid.rowconfigure(self, 1, weight=1)
@@ -55,8 +72,12 @@ class MenuPage(tk.Frame):
             column=0, row=0, sticky='nsew')
         tk.Button(self, text='Calibrate', font=font, command=lambda: controller.show_frame(Calibrate)).grid(
             column=0, row=1, sticky='nsew')
-        tk.Button(self, text='Difficulty', font=font, command=lambda: controller.show_frame(Difficulty)).grid(
-            column=1, row=0, sticky='nsew')
+
+        self.difficulty_button = tk.Button(self, text='Difficulty:\n' + str(controller.get_difficulty()) + "/10",
+                                           font=font, command=lambda: controller.show_frame(Difficulty))
+        self.difficulty_button.grid(column=1, row=0, sticky='nsew')
+        self.refresh_difficulty()
+
         tk.Button(self, text='Reset?', font=font, command=lambda: controller.show_frame(PageFour)).grid(
             column=1, row=1, sticky='nsew')
 
@@ -102,7 +123,7 @@ class MenuPage(tk.Frame):
         self.button9 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button9, 9))
         self.button9.place(in_=self.button_frame, x=x_shift + 165, y=y_shift + 35)
 
-        self.button_frame.after(1000, self.refresh_cups())
+        self.refresh_cups()
 
         tk.Button(self, text='Console', font=font, command=lambda: controller.show_frame(Console)).grid(
             column=2, row=1, sticky='nsew')
@@ -116,10 +137,10 @@ class MenuPage(tk.Frame):
     def click(self, widget, pos):
         self.button_flags[pos]
         if self.button_flags[pos] == 1:
-            widget.config(bg="white", image=self.no_cup)
+            widget.config(image=self.no_cup)
             self.button_flags[pos] = 0
         else:
-            widget.config(bg="white", image=self.cup)
+            widget.config(image=self.cup)
 
             self.button_flags[pos] = 1
 
@@ -137,6 +158,13 @@ class MenuPage(tk.Frame):
         self.click(self.button9, 9)
         self.counter += 1
         self.after(1000, self.refresh_cups)
+
+    def show_difficulty(self, widget, difficulty):
+        widget.config(text='Difficulty:\n' + str(difficulty) + "/10")
+
+    def refresh_difficulty(self):
+        self.show_difficulty(self.difficulty_button, self.controller.get_difficulty())
+        self.after(100, self.refresh_difficulty)
 
 
 class Start(tk.Frame):
@@ -173,10 +201,16 @@ class Difficulty(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text='Page Three!!!', font=font)
-        label.pack(pady=10, padx=10)
-
-        tk.Button(self, text='Back to Home', command=lambda: controller.show_frame(MenuPage)).pack()
+        label = tk.Label(self, text="Set difficulty:", font=font)
+        label.pack()
+        self.difficulty = tk.IntVar()
+        scale = tk.Scale(self, from_=1, to=10, variable=self.difficulty, orient=tk.HORIZONTAL, length=600,
+                         sliderlength=15, tickinterval=1, width=20, showvalue=False)
+        scale.pack(pady=100)
+        tk.Button(self, text='Back to Home', font=font,
+                  command=lambda: combine_funcs(controller.show_frame(MenuPage),
+                                                controller.set_difficulty(self.difficulty.get()))).pack(
+            side=tk.BOTTOM)
 
 
 class PageFour(tk.Frame):
@@ -197,8 +231,8 @@ class Console(tk.Frame):
         toolbar.pack(side='top', fill='x')
         tk.Button(self, text='print to stdout', command=self.print_stdout).pack(in_=toolbar, side='left')
         tk.Button(self, text='print to stderr', command=self.print_stderr).pack(in_=toolbar, side='left')
-        tk.Button(self, text='Back to Home', command=lambda: controller.show_frame(MenuPage)).pack(in_=toolbar,
-                                                                                                   side='right')
+        tk.Button(self, text='Back to Home', command=lambda: controller.show_frame(MenuPage)).pack(
+            in_=toolbar, side='right')
         self.text = tk.Text(self, wrap='word', bg='black')
         self.text.pack(side='top', fill='both', expand=True)
         self.text.tag_configure('stderr', foreground='red')
