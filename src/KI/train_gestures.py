@@ -12,7 +12,7 @@ from KI.smallervggnet import SmallerVGGNet
 # Run Tensorboard: tensorboard --logdir=resource/tensorboard in Terminal
 
 Image_size = config.image_size
-npz_file_path = os.path.join("resource", "preprocessed_images_100.npz")
+npz_file_path = os.path.join("resource","images","compressed", "preprocessed_images_gestures100.npz")
 
 X_train = np.load(npz_file_path)['X_train']
 X_test = np.load(npz_file_path)['X_test']
@@ -28,7 +28,7 @@ aug = ImageDataGenerator(rotation_range=25, width_shift_range=0.1,
 # in the network so we can perform multi-label classification
 model = SmallerVGGNet.build(
     width=Image_size[1], height=Image_size[0],
-    depth=Image_size[2], classes=10,
+    depth=Image_size[2], classes=4,
     finalAct='sigmoid')
 
 # model = models.MobileNetv2(input_shape=config.image_size_0, k=10)
@@ -36,7 +36,7 @@ model = SmallerVGGNet.build(
 # initialize the optimizer (SGD is sufficient)
 opt = Adam(lr=config.iteration_learn_rate, decay=config.iteration_learn_rate / config.epochs)
 
-checkpoints_filepath = os.path.join("resource", "checkpoints", "model_100_1.h5")
+checkpoints_filepath = os.path.join("resource", "checkpoints", "model_gestures_100_1.h5")
 model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath=checkpoints_filepath,
     save_weights_only=False,
@@ -61,7 +61,7 @@ reduce_lr = ReduceLROnPlateau(monitor="binary_crossentropy", factor=0.2, patienc
 # multi-label classification, but keep in mind that the goal here
 # is to treat each output label as an independent Bernoulli
 # distribution
-model.compile(loss='binary_crossentropy', optimizer=opt,
+model.compile(loss='sparse_categorical_crossentropy', optimizer=opt,
               metrics=['accuracy'])
 
 model.fit_generator(
