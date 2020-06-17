@@ -136,7 +136,7 @@ class MenuPage(tk.Frame):
         self.click(self.button8, 8)
         self.click(self.button9, 9)
         self.counter += 1
-        self.after(1000, self.refresh_cups())
+        self.after(1000, self.refresh_cups)
 
 
 class Start(tk.Frame):
