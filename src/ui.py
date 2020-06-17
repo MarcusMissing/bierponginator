@@ -1,3 +1,4 @@
+import os
 import sys
 import tkinter as tk
 
@@ -84,8 +85,10 @@ class MenuPage(tk.Frame):
         self.button_frame = tk.Frame(self)
         self.button_frame.grid(column=2, row=0, sticky='nsew')
 
-        self.cup = tk.PhotoImage(file="../resource/cup.png")
-        self.no_cup = tk.PhotoImage(file="../resource/no_cup.png")
+        cup_path = os.path.join("..", "resource", "cup.png")
+        no_cup_path = os.path.join("..", "resource", "no_cup.png")
+        self.cup = tk.PhotoImage(file=cup_path)
+        self.no_cup = tk.PhotoImage(file=no_cup_path)
 
         self.button_flags = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=bool)
         self.counter = 0
@@ -164,7 +167,7 @@ class MenuPage(tk.Frame):
 
     def refresh_difficulty(self):
         self.show_difficulty(self.difficulty_button, self.controller.get_difficulty())
-        self.after(100, self.refresh_difficulty)
+        self.after(300, self.refresh_difficulty)
 
 
 class Start(tk.Frame):
