@@ -11,7 +11,7 @@ from KI.smallervggnet import SmallerVGGNet
 
 # Run Tensorboard: tensorboard --logdir=resource/tensorboard in Terminal
 
-Image_size = config.image_size
+Image_size = config.image_size_gesture
 npz_file_path = os.path.join("resource", "compressed", "preprocessed_images_gestures140.npz")
 
 X_train = np.load(npz_file_path)['X_train']
