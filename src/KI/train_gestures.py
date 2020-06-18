@@ -19,18 +19,16 @@ X_test = np.load(npz_file_path)['X_test']
 y_train = np.array(np.load(npz_file_path)['y_train'], dtype='float')
 y_test = np.array(np.load(npz_file_path)['y_test'], dtype='float')
 
-for j, i in enumerate(y_train):
-    if i == 3.0:
-        y_train = np.delete(y_train, j)
-        X_train = np.delete(X_train, j, 0)
-for j, i in enumerate(y_test):
-    if i == 3.0:
-        y_test = np.delete(y_test, j)
-        X_test = np.delete(X_test, j, 0)
+for j in np.where(y_train == 3.0):
+    y_train = np.delete(y_train, j)
+    X_train = np.delete(X_train, j, 0)
+for j in np.where(y_test == 3.0):
+    y_test = np.delete(y_test, j)
+    X_test = np.delete(X_test, j, 0)
 # construct the image generator for data augmentation
 aug = ImageDataGenerator(rotation_range=25, width_shift_range=0.1,
-                         height_shift_range=0.1, shear_range=0.2, zoom_range=0.2,
-                         horizontal_flip=True, fill_mode='nearest')
+                         height_shift_range=0.1, shear_range=0.2, zoom_range=0.4,
+                         horizontal_flip=False, fill_mode='nearest')
 
 # initialize the model using a sigmoid activation as the final layer
 # in the network so we can perform multi-label classification
@@ -48,7 +46,7 @@ checkpoints_filepath = os.path.join("resource", "checkpoints", "model_gestures_1
 model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath=checkpoints_filepath,
     save_weights_only=False,
-    monitor='accuracy',
+    monitor='val_accuracy',
     mode='max',
     save_best_only=True)
 
