@@ -1,5 +1,5 @@
 # ---------------- config params ----------------
-image_size = (100, 100, 3)
+image_size = (140, 140, 3)
 batch_size = 32
 epochs = 150
 iteration_learn_rate = 1e-3

@@ -28,8 +28,8 @@ aug = ImageDataGenerator(rotation_range=25, width_shift_range=0.1,
 # in the network so we can perform multi-label classification
 model = SmallerVGGNet.build(
     width=Image_size[1], height=Image_size[0],
-    depth=Image_size[2], classes=4,
-    finalAct='sigmoid')
+    depth=Image_size[2], classes=3,
+    finalAct='softmax')
 
 # model = models.MobileNetv2(input_shape=config.image_size_0, k=10)
 
