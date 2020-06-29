@@ -1,24 +1,30 @@
-import socket
+import socketserver
 
 
-def Main():
-    host = '192.168.178.59'  # Server ip
-    port = 4000
+class Handler_TCPServer(socketserver.BaseRequestHandler):
+    """
+    The TCP Server class for demonstration.
 
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.bind((host, port))
+    Note: We need to implement the Handle method to exchange data
+    with TCP client.
 
-    print("Server Started")
-    while True:
-        data, addr = s.recvfrom(1024)
-        data = data.decode('utf-8')
-        print("Message from: " + str(addr))
-        print("From connected user: " + data)
-        data = data.upper()
-        print("Sending: " + data)
-        s.sendto(data.encode('utf-8'), addr)
-    c.close()
+    """
+
+    def handle(self):
+        # self.request - TCP socket connected to the client
+        self.data = self.request.recv(1024).strip()
+        print("{} sent:".format(self.client_address[0]))
+        print(self.data)
+        # just send back ACK for data arrival confirmation
+        self.request.sendall("ACK from TCP Server".encode())
 
 
-if __name__ == '__main__':
-    Main()
+if __name__ == "__main__":
+    HOST, PORT = "192.168.178.59", 9999
+
+    # Init the TCP server object, bind it to the localhost on 9999 port
+    tcp_server = socketserver.TCPServer((HOST, PORT), Handler_TCPServer)
+
+    # Activate the TCP server.
+    # To abort the TCP server, press Ctrl-C.
+    tcp_server.serve_forever()
