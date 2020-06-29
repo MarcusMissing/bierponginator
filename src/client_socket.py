@@ -1,20 +1,34 @@
+import cv2
+import io
 import socket
+import struct
+import time
+import pickle
+import zlib
 
-host_ip, server_port = "192.168.178.59", 9999
-data = " Hello how are you?\n"
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect(('Gaming-PC', 9999))
+connection = client_socket.makefile('wb')
 
-# Initialize a TCP client socket using SOCK_STREAM
-tcp_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+cam = cv2.VideoCapture(0)
 
-try:
-    # Establish connection to TCP server and exchange data
-    tcp_client.connect((host_ip, server_port))
-    tcp_client.sendall(data.encode())
+cam.set(3, 320);
+cam.set(4, 240);
 
-    # Read data from the TCP server and close the connection
-    received = tcp_client.recv(1024)
-finally:
-    tcp_client.close()
+img_counter = 0
 
-print ("Bytes Sent:     {}".format(data))
-print ("Bytes Received: {}".format(received.decode()))
+encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+
+while True:
+    ret, frame = cam.read()
+    result, frame = cv2.imencode('.jpg', frame, encode_param)
+#    data = zlib.compress(pickle.dumps(frame, 0))
+    data = pickle.dumps(frame, 0)
+    size = len(data)
+
+
+    print("{}: {}".format(img_counter, size))
+    client_socket.sendall(struct.pack(">L", size) + data)
+    img_counter += 1
+
+cam.release()
