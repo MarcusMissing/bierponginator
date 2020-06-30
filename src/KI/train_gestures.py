@@ -6,36 +6,39 @@ from tensorflow.keras.callbacks import TensorBoard
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-from KI import config
-from KI.smallervggnet import SmallerVGGNet
+from KI import config, build_model
+from src import RESOURCE_DIR
 
 # Run Tensorboard: tensorboard --logdir=resource/tensorboard in Terminal
 
 Image_size = config.image_size_gesture
-npz_file_path = os.path.join("resource", "compressed", "preprocessed_images_gestures140.npz")
+npz_file_path = os.path.join(RESOURCE_DIR, "images", "compressed", "preprocessed_images_gestures256.npz")
 
 X_train = np.load(npz_file_path)['X_train']
 X_test = np.load(npz_file_path)['X_test']
 y_train = np.array(np.load(npz_file_path)['y_train'], dtype='float')
 y_test = np.array(np.load(npz_file_path)['y_test'], dtype='float')
 
-for j in np.where(y_train == 3.0):
-    y_train = np.delete(y_train, j)
-    X_train = np.delete(X_train, j, 0)
-for j in np.where(y_test == 3.0):
-    y_test = np.delete(y_test, j)
-    X_test = np.delete(X_test, j, 0)
+# for j in np.where(y_train == 3.0):
+#     y_train = np.delete(y_train, j)
+#     X_train = np.delete(X_train, j, 0)
+# for j in np.where(y_test == 3.0):
+#     y_test = np.delete(y_test, j)
+#     X_test = np.delete(X_test, j, 0)
 # construct the image generator for data augmentation
-aug = ImageDataGenerator(rotation_range=25, width_shift_range=0.1,
+
+aug = ImageDataGenerator(rotation_range=45, width_shift_range=0.1,
                          height_shift_range=0.1, shear_range=0.2, zoom_range=0.4,
-                         horizontal_flip=False, fill_mode='nearest')
+                         horizontal_flip=False, vertical_flip=True, fill_mode='nearest')
 
 # initialize the model using a sigmoid activation as the final layer
 # in the network so we can perform multi-label classification
-model = SmallerVGGNet.build(
-    width=Image_size[1], height=Image_size[0],
-    depth=Image_size[2], classes=3,
-    finalAct='softmax')
+# model = SmallerVGGNet.build(
+#     width=Image_size[1], height=Image_size[0],
+#     depth=Image_size[2], classes=3,
+#     finalAct='softmax')
+
+model = build_model.model
 
 # model = models.MobileNetv2(input_shape=config.image_size_0, k=10)
 
