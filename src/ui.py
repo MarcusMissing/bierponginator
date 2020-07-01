@@ -1,8 +1,11 @@
 import os
+import pickle
+import socket
+import struct
 import sys
 import tkinter as tk
 
-import numpy as np
+import cv2
 
 font = ('Comic Sans MS', 36, 'bold')
 possibilities = [[i, j, k, l, m, n, o, p, q, r] for r in range(2)
@@ -40,7 +43,7 @@ class MainFrame(tk.Tk):
 
         self.frames = {}
 
-        for F in (MenuPage, Start, Calibrate, Difficulty, PageFour, Console):
+        for F in (MenuPage, Calibrate, Difficulty, PageFour, Console):
             frame = F(container, self)
 
             self.frames[F] = frame
@@ -61,16 +64,30 @@ class MainFrame(tk.Tk):
 
 
 class MenuPage(tk.Frame):
-
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
+        cup_path = os.path.join("..", "resource", "cup.png")
+        no_cup_path = os.path.join("..", "resource", "no_cup.png")
+        self.cup = tk.PhotoImage(file=cup_path)
+        self.no_cup = tk.PhotoImage(file=no_cup_path)
+        self.button_flags = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client_socket.connect(('', 9999))  # Enter Server IP here
+        self.cam = cv2.VideoCapture(0)
+        self.cam.set(3, 320)
+        self.cam.set(4, 240)
+        self.encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+        self.classify()
+
         tk.Grid.columnconfigure(self, 2, weight=1)
         tk.Grid.rowconfigure(self, 1, weight=1)
 
-        tk.Button(self, text='Start/Stop', font=font, command=lambda: controller.show_frame(Start)).grid(
+        tk.Button(self, text='Test', font=font, command=lambda: print("test")).grid(
             column=0, row=0, sticky='nsew')
+
         tk.Button(self, text='Calibrate', font=font, command=lambda: controller.show_frame(Calibrate)).grid(
             column=0, row=1, sticky='nsew')
 
@@ -84,14 +101,6 @@ class MenuPage(tk.Frame):
 
         self.button_frame = tk.Frame(self)
         self.button_frame.grid(column=2, row=0, sticky='nsew')
-
-        cup_path = os.path.join("..", "resource", "cup.png")
-        no_cup_path = os.path.join("..", "resource", "no_cup.png")
-        self.cup = tk.PhotoImage(file=cup_path)
-        self.no_cup = tk.PhotoImage(file=no_cup_path)
-
-        self.button_flags = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=bool)
-        self.counter = 0
 
         x_shift = 5
         y_shift = -15
@@ -137,18 +146,30 @@ class MenuPage(tk.Frame):
         for y in range(1):
             tk.Grid.rowconfigure(self, y, weight=1)
 
+    def classify(self):
+        frame = self.cam.read()[1]
+        result, frame = cv2.imencode('.jpg', frame, self.encode_param)
+        data = pickle.dumps(frame, 0)
+        size = len(data)
+
+        self.client_socket.sendall(struct.pack(">L", size) + data)
+
+        score = self.client_socket.recv(1024)
+        score = pickle.loads(score)
+
+        for i, j in enumerate(score):
+            self.button_flags[i] = j
+
+        self.after(100, self.classify)
+
     def click(self, widget, pos):
         self.button_flags[pos]
-        if self.button_flags[pos] == 1:
-            widget.config(image=self.no_cup)
-            self.button_flags[pos] = 0
-        else:
+        if self.button_flags[pos] == 1.0:
             widget.config(image=self.cup)
-
-            self.button_flags[pos] = 1
+        else:
+            widget.config(image=self.no_cup)
 
     def refresh_cups(self):
-        self.button_flags = possibilities[self.counter]
         self.click(self.button0, 0)
         self.click(self.button1, 1)
         self.click(self.button2, 2)
@@ -159,7 +180,6 @@ class MenuPage(tk.Frame):
         self.click(self.button7, 7)
         self.click(self.button8, 8)
         self.click(self.button9, 9)
-        self.counter += 1
         self.after(1000, self.refresh_cups)
 
     def show_difficulty(self, widget, difficulty):
@@ -168,16 +188,6 @@ class MenuPage(tk.Frame):
     def refresh_difficulty(self):
         self.show_difficulty(self.difficulty_button, self.controller.get_difficulty())
         self.after(300, self.refresh_difficulty)
-
-
-class Start(tk.Frame):
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text='Page One!!!', font=font)
-        label.pack(pady=10, padx=10)
-
-        tk.Button(self, text='Back to Home', command=lambda: controller.show_frame(MenuPage)).pack()
 
 
 class Calibrate(tk.Frame):
