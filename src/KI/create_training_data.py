@@ -17,10 +17,13 @@ random.seed = 49
 random.shuffle(paths)
 
 for j, ID in tqdm(enumerate(paths)):
-
-    img_full = cv2.imread(ID)
-    img = cv2.resize(img_full, config.image_size_gesture[0:2])
-    img = np.divide(img, 255)
+    try:
+        img_full = cv2.imread(ID)
+        img = cv2.resize(img_full, config.image_size_gesture[0:2])
+        img = np.divide(img, 255)
+    except Exception as e:
+        print(e)
+        img = np.zeros(config.image_size_gesture)
     X[j,] = img
     y[j] = int(ID.split(".")[-3])
 
