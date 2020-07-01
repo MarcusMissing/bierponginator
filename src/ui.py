@@ -4,6 +4,8 @@ import tkinter as tk
 
 import numpy as np
 
+import client_socket
+
 font = ('Comic Sans MS', 36, 'bold')
 possibilities = [[i, j, k, l, m, n, o, p, q, r] for r in range(2)
                  for q in range(2)
@@ -40,7 +42,7 @@ class MainFrame(tk.Tk):
 
         self.frames = {}
 
-        for F in (MenuPage, Start, Calibrate, Difficulty, PageFour, Console):
+        for F in (MenuPage, Calibrate, Difficulty, PageFour, Console):
             frame = F(container, self)
 
             self.frames[F] = frame
@@ -69,8 +71,9 @@ class MenuPage(tk.Frame):
         tk.Grid.columnconfigure(self, 2, weight=1)
         tk.Grid.rowconfigure(self, 1, weight=1)
 
-        tk.Button(self, text='Start/Stop', font=font, command=lambda: controller.show_frame(Start)).grid(
+        tk.Button(self, text='Start/Stop', font=font, command=lambda: client_socket.start_classify()).grid(
             column=0, row=0, sticky='nsew')
+
         tk.Button(self, text='Calibrate', font=font, command=lambda: controller.show_frame(Calibrate)).grid(
             column=0, row=1, sticky='nsew')
 
@@ -168,16 +171,6 @@ class MenuPage(tk.Frame):
     def refresh_difficulty(self):
         self.show_difficulty(self.difficulty_button, self.controller.get_difficulty())
         self.after(300, self.refresh_difficulty)
-
-
-class Start(tk.Frame):
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text='Page One!!!', font=font)
-        label.pack(pady=10, padx=10)
-
-        tk.Button(self, text='Back to Home', command=lambda: controller.show_frame(MenuPage)).pack()
 
 
 class Calibrate(tk.Frame):
