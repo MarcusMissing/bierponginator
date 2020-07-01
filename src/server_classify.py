@@ -88,11 +88,13 @@ def live_classify(model, model_gestures, fps):
         cv2.putText(img_big, pred_str_3, (700, 900), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
         cv2.putText(img_big, pred_str_4, (700, 950), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
 
+        score = np.round(score[0, 0:])
+
         data_string = pickle.dumps(score, 0)
         conn.send(data_string)
 
         cv2.putText(img_big, "Press 0 to terminate", (40, 40), font, 0.8, (0, 255, 0), 2, cv2.LINE_AA)
-        #cv2.imshow('camera output', img_big)
+        cv2.imshow('camera output', img_big)
         k = cv2.waitKey(10)
         if k == 48:
             break
