@@ -8,16 +8,8 @@ import tkinter as tk
 import cv2
 
 font = ('Comic Sans MS', 36, 'bold')
-possibilities = [[i, j, k, l, m, n, o, p, q, r] for r in range(2)
-                 for q in range(2)
-                 for p in range(2)
-                 for o in range(2)
-                 for n in range(2)
-                 for m in range(2)
-                 for l in range(2)
-                 for k in range(2)
-                 for j in range(2)
-                 for i in range(2)]
+server_name = ''
+fps = 60
 
 
 def combine_funcs(*funcs):
@@ -75,7 +67,7 @@ class MenuPage(tk.Frame):
         self.button_flags = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect(('', 9999))  # Enter Server IP here
+        self.client_socket.connect((server_name, 9999))  # Enter Server IP here
         self.cam = cv2.VideoCapture(0)
         self.cam.set(3, 320)
         self.cam.set(4, 240)
@@ -85,8 +77,8 @@ class MenuPage(tk.Frame):
         tk.Grid.columnconfigure(self, 2, weight=1)
         tk.Grid.rowconfigure(self, 1, weight=1)
 
-        tk.Button(self, text='Test', font=font, command=lambda: print("test")).grid(
-            column=0, row=0, sticky='nsew')
+        self.gesture_button = tk.Button(self, text='Gesture', font=font, command=lambda: print("Gesture"))
+        self.gesture_button.grid(column=0, row=0, sticky='nsew')
 
         tk.Button(self, text='Calibrate', font=font, command=lambda: controller.show_frame(Calibrate)).grid(
             column=0, row=1, sticky='nsew')
@@ -157,10 +149,15 @@ class MenuPage(tk.Frame):
         score = self.client_socket.recv(1024)
         score = pickle.loads(score)
 
-        for i, j in enumerate(score):
+        for i, j in enumerate(score[0]):
             self.button_flags[i] = j
 
-        self.after(100, self.classify)
+        self.show_gesture(self.gesture_button, score[1])
+
+        self.after(round(1000 / fps), self.classify)
+
+    def show_gesture(self, widget, gesture):
+        widget.config(text='Gesture:\n' + str(gesture))
 
     def click(self, widget, pos):
         self.button_flags[pos]
