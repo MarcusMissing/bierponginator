@@ -8,7 +8,7 @@ import tkinter as tk
 import cv2
 
 font = ('Comic Sans MS', 36, 'bold')
-server_name = ''
+server_name = '192.168.178.75'  # Enter Server IP here
 fps = 60
 
 
@@ -67,18 +67,16 @@ class MenuPage(tk.Frame):
         self.button_flags = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect((server_name, 9999))  # Enter Server IP here
+        self.client_socket.connect((server_name, 9999))
         self.cam = cv2.VideoCapture(0)
-        self.cam.set(3, 320)
-        self.cam.set(4, 240)
         self.encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
-        self.classify()
 
         tk.Grid.columnconfigure(self, 2, weight=1)
         tk.Grid.rowconfigure(self, 1, weight=1)
 
-        self.gesture_button = tk.Button(self, text='Gesture', font=font, command=lambda: print("Gesture"))
+        self.gesture_button = tk.Button(self, text='Gesture', font=font, command=lambda: print("gesture test"))
         self.gesture_button.grid(column=0, row=0, sticky='nsew')
+        self.classify()
 
         tk.Button(self, text='Calibrate', font=font, command=lambda: controller.show_frame(Calibrate)).grid(
             column=0, row=1, sticky='nsew')
