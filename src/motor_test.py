@@ -5,7 +5,7 @@ import RPi.GPIO as GPIO
 import KI.config as config
 
 
-def init_GPIO:
+def init_GPIO():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(config.DIR_1, GPIO.OUT)
     GPIO.setup(config.STEP_1, GPIO.OUT)
