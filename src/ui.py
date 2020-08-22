@@ -17,6 +17,9 @@ server_name = '192.168.178.75'  # Enter Server IP here
 fps = 60
 connection_established = False
 
+if config.pi:
+    motor_test.init_GPIO()
+
 
 def combine_funcs(*funcs):
     def combined_func(*args, **kwargs):
@@ -241,23 +244,23 @@ class Motor(tk.Frame):
         tk.Grid.rowconfigure(self, 2, weight=1)
 
         if config.pi:
-            tk.Button(self, text='Motor 1\nleft', font=font,
-                      command=lambda: motor_test.motor_test(config.DIR_1, config.CW, config.STEP_1, steps=10,
+            tk.Button(self, text='Motor 1\nCCW', font=font,
+                      command=lambda: motor_test.motor_test(config.DIR_1, config.CCW, config.STEP_1, steps=10,
                                                             delay=.005)).grid(
                 column=0, row=0, sticky='nsew')
 
-            tk.Button(self, text='Motor 1\nright', font=font,
+            tk.Button(self, text='Motor 1\nCW', font=font,
                       command=lambda: motor_test.motor_test(config.DIR_1, config.CCW, config.STEP_1, steps=10,
                                                             delay=.005)).grid(
                 column=1, row=0, sticky='nsew')
 
-            tk.Button(self, text='Motor 2\nleft', font=font,
-                      command=lambda: motor_test.motor_test(config.DIR_2, config.CW, config.STEP_2, steps=10,
+            tk.Button(self, text='Motor 2\nCCW', font=font,
+                      command=lambda: motor_test.motor_test(config.DIR_2, config.CCW, config.STEP_2, steps=10,
                                                             delay=.005)).grid(
                 column=0, row=1, sticky='nsew')
 
-            tk.Button(self, text='Motor 2\nright', font=font,
-                      command=lambda: motor_test.motor_test(config.DIR_2, config.CCW, config.STEP_2, steps=10,
+            tk.Button(self, text='Motor 2\nCW', font=font,
+                      command=lambda: motor_test.motor_test(config.DIR_2, config.CW, config.STEP_2, steps=10,
                                                             delay=.005)).grid(
                 column=1, row=1, sticky='nsew')
 

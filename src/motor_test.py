@@ -4,11 +4,13 @@ import RPi.GPIO as GPIO
 
 import KI.config as config
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(config.DIR_1, GPIO.OUT)
-GPIO.setup(config.STEP_1, GPIO.OUT)
-GPIO.setup(config.DIR_2, GPIO.OUT)
-GPIO.setup(config.STEP_2, GPIO.OUT)
+
+def init_GPIO:
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(config.DIR_1, GPIO.OUT)
+    GPIO.setup(config.STEP_1, GPIO.OUT)
+    GPIO.setup(config.DIR_2, GPIO.OUT)
+    GPIO.setup(config.STEP_2, GPIO.OUT)
 
 
 def motor_test(DIR_pin, DIR, STEP_pin, steps, delay):
@@ -19,6 +21,8 @@ def motor_test(DIR_pin, DIR, STEP_pin, steps, delay):
         GPIO.output(STEP_pin, GPIO.LOW)
         sleep(delay)
 
+
+init_GPIO()
 
 motor_test(config.DIR_1, config.CW, config.STEP_1, steps=50, delay=.005)
 motor_test(config.DIR_1, config.CCW, config.STEP_1, steps=50, delay=.005)
