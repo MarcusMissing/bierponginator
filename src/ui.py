@@ -9,6 +9,7 @@ from time import sleep
 import cv2
 
 import KI.config as config
+
 if config.pi:
     import motor_test
 
@@ -246,23 +247,19 @@ class Motor(tk.Frame):
         if config.pi:
             tk.Button(self, text='Motor 1\nCCW', font=font,
                       command=lambda: motor_test.motor_test(config.DIR_1, config.CCW, config.STEP_1, steps=10,
-                                                            delay=.005)).grid(
-                column=0, row=0, sticky='nsew')
+                                                            delay=.05)).grid(column=0, row=0, sticky='nsew')
 
             tk.Button(self, text='Motor 1\nCW', font=font,
-                      command=lambda: motor_test.motor_test(config.DIR_1, config.CCW, config.STEP_1, steps=10,
-                                                            delay=.005)).grid(
-                column=1, row=0, sticky='nsew')
+                      command=lambda: motor_test.motor_test(config.DIR_1, config.CW, config.STEP_1, steps=10,
+                                                            delay=.05)).grid(column=1, row=0, sticky='nsew')
 
             tk.Button(self, text='Motor 2\nCCW', font=font,
                       command=lambda: motor_test.motor_test(config.DIR_2, config.CCW, config.STEP_2, steps=10,
-                                                            delay=.005)).grid(
-                column=0, row=1, sticky='nsew')
+                                                            delay=.005)).grid(column=0, row=1, sticky='nsew')
 
             tk.Button(self, text='Motor 2\nCW', font=font,
                       command=lambda: motor_test.motor_test(config.DIR_2, config.CW, config.STEP_2, steps=10,
-                                                            delay=.005)).grid(
-                column=1, row=1, sticky='nsew')
+                                                            delay=.005)).grid(column=1, row=1, sticky='nsew')
 
         tk.Button(self, text='Back to Home', font=font, command=lambda: controller.show_frame(MenuPage)).grid(
             column=1, row=2, sticky='nsew')
