@@ -54,5 +54,6 @@ init_GPIO()
 # motor_test(config.DIR_2, config.CCW, config.STEP_2, steps=50, delay=.002)
 
 ramp_motor(MOTOR_X_DIR_PIN, CW, Motor_X, 60, 10000)
+motor_test(MOTOR_X_DIR_PIN, CCW, Motor_X, 55, .01)
 
 GPIO.cleanup()
