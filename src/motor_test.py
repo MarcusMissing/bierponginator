@@ -5,10 +5,11 @@ from numpy.testing._private.parameterized import param
 
 import KI.config as config
 
-MOTOR_Z_DIR_PIN = 20
-Motor_Z = 21
-MOTOR_X_DIR_PIN = 26
-Motor_X = 19
+MOTOR_Z = {"dir_pins": [20],
+           "motor_pins": [21]}
+
+MOTOR_X = {"dir_pins": [26, 12],
+           "motor_pins": [19, 16]}
 
 CW = 0
 CCW = 1
@@ -16,10 +17,8 @@ CCW = 1
 
 def init_GPIO():
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(MOTOR_Z_DIR_PIN, GPIO.OUT)
-    GPIO.setup(Motor_Z, GPIO.OUT)
-    GPIO.setup(MOTOR_X_DIR_PIN, GPIO.OUT)
-    GPIO.setup(Motor_X, GPIO.OUT)
+    for pin in [MOTOR_Z["dir_pins"], MOTOR_Z["motor_pins"], MOTOR_X["dir_pins"], MOTOR_X["motor_pins"]]:
+        GPIO.setup(pin, GPIO.OUT)
 
 
 def motor_test(DIR_pin, DIR, STEP_pin, steps, delay):
@@ -31,13 +30,19 @@ def motor_test(DIR_pin, DIR, STEP_pin, steps, delay):
         sleep(delay)
 
 
-def ramp_motor(direction_pin, direction, motor_pin, nm_steps, sps):
-    GPIO.output(direction_pin, direction)
+def ramp_motor(motor, direction, nm_steps, sps):
+    for direction_pin in motor["dir_pins"]:
+        GPIO.output(direction_pin, direction)
     for x in range(1, nm_steps):
-        GPIO.output(motor_pin, GPIO.HIGH)
-        delay = 1/(sps * (1 / (nm_steps - x)))
+        delay = 1 / (sps * (1 / (nm_steps - x)))
+
+        for motor_pin in motor["motor_pins"]:
+            GPIO.output(motor_pin, GPIO.HIGH)
+
         sleep(delay)
-        GPIO.output(motor_pin, GPIO.LOW)
+        for motor_pin in motor["motor_pins"]:
+            GPIO.output(motor_pin, GPIO.LOW)
+
         sleep(delay)
 
 
@@ -49,7 +54,7 @@ init_GPIO()
 # motor_test(config.DIR_2, config.CW, config.STEP_2, steps=50, delay=.001)
 # motor_test(config.DIR_2, config.CCW, config.STEP_2, steps=50, delay=.002)
 
-ramp_motor(MOTOR_X_DIR_PIN, CW, Motor_X, 60, 80000)
-motor_test(MOTOR_X_DIR_PIN, CCW, Motor_X, 55, .01)
+ramp_motor(MOTOR_X, CW, 60, 80000)
+ramp_motor(MOTOR_X, CCW, 60, 80000)
 
 GPIO.cleanup()
