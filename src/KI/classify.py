@@ -146,5 +146,4 @@ if __name__ == '__main__':
     if sys.argv[1] == "local":
         local_classify(model, model_gestures, fps=0)
     elif sys.argv[1] == "remote":
-        conn = init_conn()
-        remote_classify(conn, model, model_gestures)
+        remote_classify(init_conn(), model, model_gestures)

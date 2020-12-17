@@ -4,12 +4,22 @@ import socket
 import struct
 import sys
 import tkinter as tk
+from time import sleep
 
 import cv2
 
+import KI.config as config
+
+if config.pi:
+    import motor_test
+
 font = ('Comic Sans MS', 36, 'bold')
-server_name = ''
+server_name = '192.168.178.75'  # Enter Server IP here
 fps = 60
+connection_established = False
+
+if config.pi:
+    motor_test.init_GPIO()
 
 
 def combine_funcs(*funcs):
@@ -35,7 +45,7 @@ class MainFrame(tk.Tk):
 
         self.frames = {}
 
-        for F in (MenuPage, Calibrate, Difficulty, PageFour, Console):
+        for F in (MenuPage, Calibrate, Difficulty, Motor, Console):
             frame = F(container, self)
 
             self.frames[F] = frame
@@ -66,19 +76,34 @@ class MenuPage(tk.Frame):
         self.no_cup = tk.PhotoImage(file=no_cup_path)
         self.button_flags = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
-        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect((server_name, 9999))  # Enter Server IP here
-        self.cam = cv2.VideoCapture(0)
-        self.cam.set(3, 320)
-        self.cam.set(4, 240)
-        self.encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
-        self.classify()
+        for i in range(10):
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.settimeout(1)
+                s.connect((server_name, 9999))
+                global connection_established
+                connection_established = True
+                print(server_name + " is UP")
+
+                self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.client_socket.connect((server_name, 9999))
+
+                self.cam = cv2.VideoCapture(0)
+                self.encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+            except:
+                sleep(1)
+            finally:
+                print(server_name + " not UP")
+                # s.shutdown(socket.SHUT_RDWR)
+                s.close()
 
         tk.Grid.columnconfigure(self, 2, weight=1)
         tk.Grid.rowconfigure(self, 1, weight=1)
 
-        self.gesture_button = tk.Button(self, text='Gesture', font=font, command=lambda: print("Gesture"))
+        self.gesture_button = tk.Button(self, text='Gesture', font=font, command=lambda: print("gesture test"))
         self.gesture_button.grid(column=0, row=0, sticky='nsew')
+        if connection_established:
+            self.classify()
 
         tk.Button(self, text='Calibrate', font=font, command=lambda: controller.show_frame(Calibrate)).grid(
             column=0, row=1, sticky='nsew')
@@ -88,7 +113,7 @@ class MenuPage(tk.Frame):
         self.difficulty_button.grid(column=1, row=0, sticky='nsew')
         self.refresh_difficulty()
 
-        tk.Button(self, text='Reset?', font=font, command=lambda: controller.show_frame(PageFour)).grid(
+        tk.Button(self, text='Motor', font=font, command=lambda: controller.show_frame(Motor)).grid(
             column=1, row=1, sticky='nsew')
 
         self.button_frame = tk.Frame(self)
@@ -97,34 +122,34 @@ class MenuPage(tk.Frame):
         x_shift = 5
         y_shift = -15
 
-        self.button0 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button0, 0))
+        self.button0 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.change_cup(self.button0, 0))
         self.button0.place(in_=self.button_frame, x=x_shift + 95, y=y_shift + 185)
 
-        self.button1 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button1, 1))
+        self.button1 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.change_cup(self.button1, 1))
         self.button1.place(in_=self.button_frame, x=x_shift + 70, y=y_shift + 135)
 
-        self.button2 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button2, 2))
+        self.button2 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.change_cup(self.button2, 2))
         self.button2.place(in_=self.button_frame, x=x_shift + 120, y=y_shift + 135)
 
-        self.button3 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button3, 3))
+        self.button3 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.change_cup(self.button3, 3))
         self.button3.place(in_=self.button_frame, x=x_shift + 45, y=y_shift + 85)
 
-        self.button4 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button4, 4))
+        self.button4 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.change_cup(self.button4, 4))
         self.button4.place(in_=self.button_frame, x=x_shift + 95, y=y_shift + 85)
 
-        self.button5 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button5, 5))
+        self.button5 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.change_cup(self.button5, 5))
         self.button5.place(in_=self.button_frame, x=x_shift + 145, y=y_shift + 85)
 
-        self.button6 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button6, 6))
+        self.button6 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.change_cup(self.button6, 6))
         self.button6.place(in_=self.button_frame, x=x_shift + 15, y=y_shift + 35)
 
-        self.button7 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button7, 7))
+        self.button7 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.change_cup(self.button7, 7))
         self.button7.place(in_=self.button_frame, x=x_shift + 65, y=y_shift + 35)
 
-        self.button8 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button8, 8))
+        self.button8 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.change_cup(self.button8, 8))
         self.button8.place(in_=self.button_frame, x=x_shift + 115, y=y_shift + 35)
 
-        self.button9 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.click(self.button9, 9))
+        self.button9 = tk.Button(self, image=self.cup, bg='white', command=lambda: self.change_cup(self.button9, 9))
         self.button9.place(in_=self.button_frame, x=x_shift + 165, y=y_shift + 35)
 
         self.refresh_cups()
@@ -159,7 +184,7 @@ class MenuPage(tk.Frame):
     def show_gesture(self, widget, gesture):
         widget.config(text='Gesture:\n' + str(gesture))
 
-    def click(self, widget, pos):
+    def change_cup(self, widget, pos):
         self.button_flags[pos]
         if self.button_flags[pos] == 1.0:
             widget.config(image=self.cup)
@@ -167,16 +192,16 @@ class MenuPage(tk.Frame):
             widget.config(image=self.no_cup)
 
     def refresh_cups(self):
-        self.click(self.button0, 0)
-        self.click(self.button1, 1)
-        self.click(self.button2, 2)
-        self.click(self.button3, 3)
-        self.click(self.button4, 4)
-        self.click(self.button5, 5)
-        self.click(self.button6, 6)
-        self.click(self.button7, 7)
-        self.click(self.button8, 8)
-        self.click(self.button9, 9)
+        self.change_cup(self.button0, 0)
+        self.change_cup(self.button1, 1)
+        self.change_cup(self.button2, 2)
+        self.change_cup(self.button3, 3)
+        self.change_cup(self.button4, 4)
+        self.change_cup(self.button5, 5)
+        self.change_cup(self.button6, 6)
+        self.change_cup(self.button7, 7)
+        self.change_cup(self.button8, 8)
+        self.change_cup(self.button9, 9)
         self.after(1000, self.refresh_cups)
 
     def show_difficulty(self, widget, difficulty):
@@ -188,16 +213,6 @@ class MenuPage(tk.Frame):
 
 
 class Calibrate(tk.Frame):
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text='Page Two!!!', font=font)
-        label.pack(pady=10, padx=10)
-
-        tk.Button(self, text='Back to Home', command=lambda: controller.show_frame(MenuPage)).pack()
-
-
-class PageTwo(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -219,18 +234,41 @@ class Difficulty(tk.Frame):
         scale.pack(pady=100)
         tk.Button(self, text='Back to Home', font=font,
                   command=lambda: combine_funcs(controller.show_frame(MenuPage),
-                                                controller.set_difficulty(self.difficulty.get()))).pack(
-            side=tk.BOTTOM)
+                                                controller.set_difficulty(self.difficulty.get()))).pack(side=tk.BOTTOM)
 
 
-class PageFour(tk.Frame):
+class Motor(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text='Page Four!!!', font=font)
-        label.pack(pady=10, padx=10)
+        tk.Grid.columnconfigure(self, 1, weight=1)
+        tk.Grid.rowconfigure(self, 2, weight=1)
 
-        tk.Button(self, text='Back to Home', command=lambda: controller.show_frame(MenuPage)).pack()
+        if config.pi:
+            tk.Button(self, text='Motor 1\nCCW', font=font,
+                      command=lambda: motor_test.motor_test(config.DIR_1, config.CCW, config.STEP_1, steps=10,
+                                                            delay=.05)).grid(column=0, row=0, sticky='nsew')
+
+            tk.Button(self, text='Motor 1\nCW', font=font,
+                      command=lambda: motor_test.motor_test(config.DIR_1, config.CW, config.STEP_1, steps=10,
+                                                            delay=.05)).grid(column=1, row=0, sticky='nsew')
+
+            tk.Button(self, text='Motor 2\nCCW', font=font,
+                      command=lambda: motor_test.motor_test(config.DIR_2, config.CCW, config.STEP_2, steps=10,
+                                                            delay=.005)).grid(column=0, row=1, sticky='nsew')
+
+            tk.Button(self, text='Motor 2\nCW', font=font,
+                      command=lambda: motor_test.motor_test(config.DIR_2, config.CW, config.STEP_2, steps=10,
+                                                            delay=.005)).grid(column=1, row=1, sticky='nsew')
+
+        tk.Button(self, text='Back to Home', font=font, command=lambda: controller.show_frame(MenuPage)).grid(
+            column=1, row=2, sticky='nsew')
+
+        for x in range(1):
+            tk.Grid.columnconfigure(self, x, weight=1)
+
+        for y in range(2):
+            tk.Grid.rowconfigure(self, y, weight=1)
 
 
 class Console(tk.Frame):
