@@ -59,8 +59,8 @@ def drive_motor(motor,
     for j in range(1, 12):
         print("reversing")
         delay = delay* j
-        if delay>0.05:
-            delay = 0.05
+        if delay>0.01:
+            delay = 0.01
         delays.append(delay)
         GPIO.output(motor["motor_pins"], GPIO.HIGH)
         sleep(delay)
@@ -141,7 +141,7 @@ def test_motor(motor,
 test_motor(MOTOR_X,
            CW,
            50,
-           300,
+           800,
            return_to_start=True,
            ramp_func="const",
            microstepping_resolution=1)
