@@ -30,26 +30,27 @@ def drive_motor(motor,
                 sps):
     assert ramp_func in ["exp", "tanh", "const"], "ramp functions available:exp,tanh,const"
     delays = []
+    high = list(itertools.repeat(GPIO.HIGH, len(motor["motor_pins"])))
+    low = list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"])))
+
     if ramp_func == "exp":
         for x in range(1, nm_steps):
             delay = 1 / (sps * np.exp(1 / (nm_steps - x) - 1))
             delays.append(delay)
-            GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"]))))
+            GPIO.output(motor["motor_pins"], high)
             sleep(delay)
-            GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"]))))
+            GPIO.output(motor["motor_pins"], low)
             sleep(delay)
 
     if ramp_func == "tanh":
         for x in range(1, nm_steps):
             delay = (1 / sps) * 1 / (np.tanh(x * (1 / nm_steps)) + 0.2)
             delays.append(delay)
-            GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.HIGH, len(motor["motor_pins"]))))
+            GPIO.output(motor["motor_pins"], high)
             sleep(delay)
-            GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"]))))
+            GPIO.output(motor["motor_pins"], low)
             sleep(delay)
     if ramp_func == "const":
-        high = list(itertools.repeat(GPIO.HIGH, len(motor["motor_pins"])))
-        low = list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"])))
         for x in range(1, nm_steps):
             delay = 1 / sps
             delays.append(delay)
@@ -58,9 +59,9 @@ def drive_motor(motor,
             GPIO.output(motor["motor_pins"], low)
             sleep(delay)
 
-    for j in range(1, 12):
+    for j in range(1, 10):
         delay = delay * j
-        if delay > 0.2:
+        if delay > 0.02:
             delay = 0.02
         delays.append(delay)
         GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.HIGH, len(motor["motor_pins"]))))
