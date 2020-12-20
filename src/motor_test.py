@@ -58,7 +58,7 @@ def drive_motor(motor,
 
     for j in range(1, 12):
         print("reversing")
-        delay *= j * 2
+        delay = delay* j
         delays.append(delay)
         GPIO.output(motor["motor_pins"], GPIO.HIGH)
         sleep(delay)
