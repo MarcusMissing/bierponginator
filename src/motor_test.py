@@ -111,7 +111,7 @@ def test_motor(motor,
               direction)
 
     delays = drive_motor(motor, ramp_func, nm_steps, sps)
-
+    print("k")
     print("Used ramp values: {}".format(delays))
 
     if return_to_start:
