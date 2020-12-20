@@ -34,37 +34,37 @@ def drive_motor(motor,
         for x in range(1, nm_steps):
             delay = 1 / (sps * np.exp(1 / (nm_steps - x) - 1))
             delays.append(delay)
-            GPIO.output(motor["motor_pins"], GPIO.HIGH)
+            GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"]))))
             sleep(delay)
-            GPIO.output(motor["motor_pins"], GPIO.LOW)
+            GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"]))))
             sleep(delay)
 
     if ramp_func == "tanh":
         for x in range(1, nm_steps):
             delay = (1 / sps) * 1 / (np.tanh(x * (1 / nm_steps)) + 0.2)
             delays.append(delay)
-            GPIO.output(motor["motor_pins"], GPIO.HIGH)
+            GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.HIGH, len(motor["motor_pins"]))))
             sleep(delay)
-            GPIO.output(motor["motor_pins"], GPIO.LOW)
+            GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"]))))
             sleep(delay)
     if ramp_func == "const":
         for x in range(1, nm_steps):
             delay = 1 / sps
-            GPIO.output(motor["motor_pins"], GPIO.HIGH)
+            GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.HIGH, len(motor["motor_pins"]))))
             sleep(delay)
-            GPIO.output(motor["motor_pins"], GPIO.LOW)
+            GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"]))))
             sleep(delay)
             print(x)
 
     for j in range(1, 12):
         print("reversing")
-        delay = delay* j
-        if delay>0.01:
+        delay = delay * j
+        if delay > 0.01:
             delay = 0.01
         delays.append(delay)
-        GPIO.output(motor["motor_pins"], GPIO.HIGH)
+        GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.HIGH, len(motor["motor_pins"]))))
         sleep(delay)
-        GPIO.output(motor["motor_pins"], GPIO.LOW)
+        GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"]))))
         sleep(delay)
 
     return delays
@@ -104,7 +104,6 @@ def test_motor(motor,
                return_to_start=True,
                ramp_func="const",
                microstepping_resolution=1):
-
     print(motor,
           direction,
           nm_steps,
