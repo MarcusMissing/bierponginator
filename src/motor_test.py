@@ -48,19 +48,19 @@ def drive_motor(motor,
             GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"]))))
             sleep(delay)
     if ramp_func == "const":
+        high = list(itertools.repeat(GPIO.HIGH, len(motor["motor_pins"])))
+        low = list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"])))
         for x in range(1, nm_steps):
             delay = 1 / sps
-            GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.HIGH, len(motor["motor_pins"]))))
+            GPIO.output(motor["motor_pins"], high)
             sleep(delay)
-            GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"]))))
+            GPIO.output(motor["motor_pins"], low)
             sleep(delay)
-            print(x)
 
     for j in range(1, 12):
-        print("reversing")
         delay = delay * j
-        if delay > 0.01:
-            delay = 0.01
+        if delay > 0.2:
+            delay = 0.02
         delays.append(delay)
         GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.HIGH, len(motor["motor_pins"]))))
         sleep(delay)
@@ -85,7 +85,6 @@ def microstepping(microstepping_resolution,
 
     pi.set_mode(motor["dir_pins"][0], pigpio.OUTPUT)
     pi.set_mode(motor["motor_pins"][0], pigpio.OUTPUT)
-    print(microstepping_resolution)
     for i in range(3):
         pi.write(MICROSTEP_RES_PINS[i], res[microstepping_resolution][i])
 
