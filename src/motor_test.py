@@ -139,7 +139,7 @@ def test_motor(motor,
 test_motor(MOTOR_X,
            CW,
            50,
-           800,
+           500,
            return_to_start=True,
            ramp_func="const",
            microstepping_resolution=1)
