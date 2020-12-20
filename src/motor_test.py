@@ -101,6 +101,14 @@ def test_motor(motor,
                ramp_func="const",
                microstepping_resolution=1):
 
+    print(motor,
+          direction,
+          nm_steps,
+          sps,
+          return_to_start,
+          ramp_func,
+          microstepping_resolution)
+
     if microstepping_resolution != 1:
         print("Using Microstepping")
         microstepping(microstepping_resolution, motor, nm_steps)
