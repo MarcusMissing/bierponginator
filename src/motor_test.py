@@ -52,6 +52,7 @@ def drive_motor(motor,
         low = list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"])))
         for x in range(1, nm_steps):
             delay = 1 / sps
+            delays.append(delay)
             GPIO.output(motor["motor_pins"], high)
             sleep(delay)
             GPIO.output(motor["motor_pins"], low)
@@ -112,7 +113,6 @@ def test_motor(motor,
           microstepping_resolution)
 
     if microstepping_resolution != 1:
-        print("Using Microstepping")
         microstepping(microstepping_resolution, motor, nm_steps)
 
     pins = list(itertools.chain.from_iterable([motor[key] for key in motor.keys()]))
@@ -121,7 +121,6 @@ def test_motor(motor,
               direction)
 
     delays = drive_motor(motor, ramp_func, nm_steps, sps)
-    print("k")
     print("Used ramp values: {}".format(delays))
 
     if return_to_start:
