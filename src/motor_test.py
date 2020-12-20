@@ -2,12 +2,12 @@ from time import sleep
 import itertools
 import RPi.GPIO as GPIO
 import numpy as np
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 import pigpio
 
 MOTOR_Z = {"dir_pins": [20],
            "motor_pins": [21],
-           "switch": [10]}
+           }
 
 MOTOR_X = {"dir_pins": [26, 12],
            "motor_pins": [19, 16]}
@@ -80,22 +80,15 @@ def microstepping(microstepping_resolution,
            16: (0, 0, 1),
            32: (1, 0, 1)}
 
-    pi.set_mode(motor["dir_pins"], pigpio.OUTPUT)
-    pi.set_mode(motor["motor_pins"], pigpio.OUTPUT)
-
-    pi.set_mode(motor["switch"], pigpio.INPUT)
-    pi.set_pull_up_down(motor["switch"], pigpio.PUD_UP)
-
+    pi.set_mode(motor["dir_pins"][0], pigpio.OUTPUT)
+    pi.set_mode(motor["motor_pins"][0], pigpio.OUTPUT)
+    print(microstepping_resolution)
     for i in range(3):
         pi.write(MICROSTEP_RES_PINS[i], res[microstepping_resolution][i])
 
     # Set duty cycle and frequency
-    pi.set_PWM_dutycycle(motor["motor_pins"], 128)  # PWM 1/2 On 1/2 Off
-    pi.set_PWM_frequency(motor["motor_pins"], 500)  # 500 pulses per second
-
-    for i in range(nm_steps * microstepping_resolution):
-        pi.write(motor["dir_pins"], pi.read(motor["switch"]))  # Set direction
-        sleep(.1)
+    pi.set_PWM_dutycycle(motor["motor_pins"][0], 128)  # PWM 1/2 On 1/2 Off
+    pi.set_PWM_frequency(motor["motor_pins"][0], 500)  # 500 pulses per second
 
     pi.set_PWM_dutycycle(motor["motor_pins"], 0)  # PWM off
     pi.stop()
@@ -108,9 +101,9 @@ def test_motor(motor,
                return_to_start=True,
                ramp_func="const",
                plot_delays=False,
-               microstepping_resolution="Full"):
+               microstepping_resolution=1):
 
-    if microstepping_resolution is not 1:
+    if microstepping_resolution != 1:
         microstepping(microstepping_resolution, motor, nm_steps)
 
     pins = list(itertools.chain.from_iterable([motor[key] for key in motor.keys()]))
@@ -120,28 +113,30 @@ def test_motor(motor,
 
     delays = drive_motor(motor, ramp_func, nm_steps, sps)
 
-    if plot_delays:
-        plt.xlabel("steps")
-        plt.ylabel("delays")
-        plt.plot(delays)
-    else:
-        print("Used ramp values: {}".format(delays))
+    #if plot_delays:
+        #plt.xlabel("steps")
+        #plt.ylabel("delays")
+        #plt.plot(delays)
+    print("Used ramp values: {}".format(delays))
 
     if return_to_start:
+        print('returning')
         sleep(0.2)
         test_motor(motor,
                    int(np.logical_not(direction)),
                    nm_steps,
                    sps,
                    return_to_start=False,
-                   microstepping_resolution=microstepping_resolution)
+                   ramp_func="const",
+                    plot_delays= True,
+                    microstepping_resolution=1)
 
 
-test_params = {"use_ramp": True,
-               "return_to_start": True,
-               "ramp_func": "exp",
-               "plot_delays": False,
-               "microstepping_resolution": 1}
+test_motor(MOTOR_X,
+           CW, 50, 300,
+           return_to_start=True,
+            ramp_func="const",
+            plot_delays= True,
+            microstepping_resolution=1)
 
-test_motor(MOTOR_X, CW, 50, 400, *test_params)
 GPIO.cleanup()
