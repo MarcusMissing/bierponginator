@@ -2,7 +2,6 @@ from time import sleep
 import itertools
 import RPi.GPIO as GPIO
 import numpy as np
-#from matplotlib import pyplot as plt
 import pigpio
 
 MOTOR_Z = {"dir_pins": [20],
@@ -100,10 +99,10 @@ def test_motor(motor,
                sps,
                return_to_start=True,
                ramp_func="const",
-               plot_delays=False,
                microstepping_resolution=1):
 
     if microstepping_resolution != 1:
+        print("Using Microstepping")
         microstepping(microstepping_resolution, motor, nm_steps)
 
     pins = list(itertools.chain.from_iterable([motor[key] for key in motor.keys()]))
@@ -113,10 +112,6 @@ def test_motor(motor,
 
     delays = drive_motor(motor, ramp_func, nm_steps, sps)
 
-    #if plot_delays:
-        #plt.xlabel("steps")
-        #plt.ylabel("delays")
-        #plt.plot(delays)
     print("Used ramp values: {}".format(delays))
 
     if return_to_start:
@@ -128,15 +123,15 @@ def test_motor(motor,
                    sps,
                    return_to_start=False,
                    ramp_func="const",
-                    plot_delays= True,
-                    microstepping_resolution=1)
+                   microstepping_resolution=1)
 
 
 test_motor(MOTOR_X,
-           CW, 50, 300,
+           CW,
+           50,
+           300,
            return_to_start=True,
-            ramp_func="const",
-            plot_delays= True,
-            microstepping_resolution=1)
+           ramp_func="const",
+           microstepping_resolution=1)
 
 GPIO.cleanup()
