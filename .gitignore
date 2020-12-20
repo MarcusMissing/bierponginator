@@ -8,4 +8,5 @@ resource/tensorboard/validation/
 resource/images/
 resource/*.npz
 src/__pycache__/
+src/KI/__pycache__/
 resource/model.h5
