@@ -153,7 +153,7 @@ def test_motor(motor,
         microstepping(microstepping_resolution, motor, nm_steps)
 
     pins = list(itertools.chain.from_iterable([motor[key] for key in motor.keys()])) + [RELAY_PIN]
-    print(str(direction))
+    print(str(pins))
     if initialize_pins:
         init_pins(pins,
                   motor,
