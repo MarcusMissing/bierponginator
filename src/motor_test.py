@@ -190,7 +190,7 @@ for _ in range(10):
                sps=700,
                initialize_pins=True,
                return_to_start=True,
-               motor_kennlinien=,
+               motor_kennlinien=None,
                microstepping_resolution=1)
     sleep(0.5)
 
