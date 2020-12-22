@@ -145,7 +145,7 @@ def test_endstop(pin):
             dir = 0
 
             if GPIO.input(pin) != 0:
-                dir = 1 if dir == 0 else 0
+                dir = int(np.logical_not(dir))
                 # print("close")
 
             test_motor(MOTOR_Z,
