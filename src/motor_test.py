@@ -182,7 +182,7 @@ test_motor(motor=MOTOR_X,
            microstepping_resolution=1)
 
 GPIO.cleanup()
-sleep(2)
+sleep(0.4)
 test_motor(motor=MOTOR_X,
            direction=CCW,
            nm_steps=50,
