@@ -35,7 +35,7 @@ def init_endstop_detect():
     GPIO.remove_event_detect(ENDSTOP_PIN)
     # GPIO.setmode(GPIO.BCM)
     GPIO.setup(ENDSTOP_PIN, GPIO.IN)
-    GPIO.add_event_detect(ENDSTOP_PIN, GPIO.RISING, bouncetime=800, callback=rising_edge_callback)
+    GPIO.add_event_detect(ENDSTOP_PIN, GPIO.RISING, bouncetime=800)
     print("Initialized endstop pin {}".format(ENDSTOP_PIN))
 
 
@@ -188,7 +188,7 @@ def test_endstop(pin):
 
 test_motor(motor=MOTOR_Z,
            direction=CW,
-           nm_steps=50,
+           nm_steps=1000,
            sps=500,
            initialize_pins=True,
            return_to_start=False,
