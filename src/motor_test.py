@@ -193,8 +193,8 @@ def test_endstop(pin):
 
 test_motor(motor=MOTOR_Z,
            direction=CCW,
-           nm_steps=2000,
-           sps=300,
+           nm_steps=10000,
+           sps=400,
            initialize_pins=True,
            return_to_start=False,
            motor_kennlinien=["const"],
