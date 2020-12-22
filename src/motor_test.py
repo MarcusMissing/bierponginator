@@ -186,11 +186,11 @@ def test_motor(motor,
 for _ in range(10):
     test_motor(motor=MOTOR_X,
                direction=CW,
-               nm_steps=45,
+               nm_steps=20,
                sps=700,
                initialize_pins=True,
                return_to_start=True,
-               motor_kennlinien=None,
+               motor_kennlinien=["const"],
                microstepping_resolution=1)
 
 GPIO.cleanup()
