@@ -136,12 +136,28 @@ def test_motor(motor,
                    microstepping_resolution=1)
 
 
-test_motor(MOTOR_X,
-           CW,
-           50,
-           500,
-           return_to_start=True,
-           ramp_func="const",
-           microstepping_resolution=1)
+def test_endstop(pin):
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(pin, GPIO.IN)
+
+    try:
+        while True:
+            if GPIO.input(pin) == 0:
+                print("open")
+            else:
+                print("close")
+    finally:
+        GPIO.cleanup()
+
+
+# test_motor(MOTOR_X,
+#            CW,
+#            50,
+#            500,
+#            return_to_start=True,
+#            ramp_func="const",
+#            microstepping_resolution=1)
+
+test_endstop()
 
 GPIO.cleanup()
