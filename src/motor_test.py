@@ -145,6 +145,7 @@ def test_motor(motor,
                return_to_start=True,
                motor_kennlinien=None,
                microstepping_resolution=1):
+
     if motor_kennlinien is None:
         motor_kennlinien = ["const", "ramp_down"]
 
@@ -164,7 +165,7 @@ def test_motor(motor,
     drive_motor(motor, motor_kennlinien, nm_steps, sps, direction)
 
     if return_to_start:
-        sleep(0.2)
+        sleep(0.8)
         test_motor(motor,
                    int(np.logical_not(direction)),
                    nm_steps,
@@ -192,6 +193,6 @@ for _ in range(50):
                return_to_start=True,
                motor_kennlinien=None,
                microstepping_resolution=1)
-    sleep(0.5)
+    sleep(0.8)
 
 GPIO.cleanup()
