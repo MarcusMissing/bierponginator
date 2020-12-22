@@ -53,8 +53,9 @@ def use_tanh(nm_steps, motor, sps, delays, high, low, direction):
     which_motor = len(motor["dir_pins"])
     for x in range(1, nm_steps):
         if GPIO.event_detected(ENDSTOP_PIN) and which_motor < 2:
-            print("Switching direction from {} to {}".format(direction, int(np.logical_not(direction))))
-            GPIO.output(motor["dir_pins"], int(np.logical_not(direction)))
+            direction = int(np.logical_not(direction))
+            print("Switching direction from {} to {}".format(direction, direction))
+            GPIO.output(motor["dir_pins"], direction)
 
         delay = (1 / sps) * 1 / (np.tanh(x * (1 / nm_steps)) + 0.2)
         delays.append(high_low_switching(delay, delays, motor, high, low))
@@ -66,8 +67,9 @@ def use_const(nm_steps, motor, sps, delays, high, low, direction):
     which_motor = len(motor["dir_pins"])
     for x in range(1, nm_steps):
         if GPIO.event_detected(ENDSTOP_PIN) and which_motor < 2:
-            print("Switching direction from {} to {}".format(direction, int(np.logical_not(direction))))
-            GPIO.output(motor["dir_pins"], int(np.logical_not(direction)))
+            direction = int(np.logical_not(direction))
+            print("Switching direction from {} to {}".format(direction, direction))
+            GPIO.output(motor["dir_pins"], direction)
 
         delay = 1 / sps
         delays.append(high_low_switching(delay, delays, motor, high, low))
@@ -137,7 +139,6 @@ def test_motor(motor,
                return_to_start=True,
                motor_kennlinien=None,
                microstepping_resolution=1):
-
     if motor_kennlinien is None:
         motor_kennlinien = ["const", "ramp_down"]
 
