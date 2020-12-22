@@ -12,6 +12,7 @@ MOTOR_X = {"dir_pins": [26, 12],
            "motor_pins": [19, 16]}
 
 MICROSTEP_RES_PINS = (14, 15, 18)
+RELAY_PIN = 6
 
 ENDSTOP_PIN = 22
 
@@ -51,6 +52,7 @@ def high_low_switching(delay, delays, motor, high, low):
 def use_tanh(nm_steps, motor, sps, delays, high, low, direction):
     print("Using Tanh velocity with {} steps ".format(nm_steps))
     which_motor = len(motor["dir_pins"])
+    GPIO.output(RELAY_PIN, GPIO.HIGH)
     for x in range(1, nm_steps):
         if GPIO.event_detected(ENDSTOP_PIN) and which_motor < 2:
             direction = int(np.logical_not(direction))
@@ -59,12 +61,15 @@ def use_tanh(nm_steps, motor, sps, delays, high, low, direction):
 
         delay = (1 / sps) * 1 / (np.tanh(x * (1 / nm_steps)) + 0.2)
         delays.append(high_low_switching(delay, delays, motor, high, low))
+    GPIO.output(RELAY_PIN, GPIO.LOW)
     return delays
 
 
 def use_const(nm_steps, motor, sps, delays, high, low, direction):
     print("Using Constant velocity with {} steps".format(nm_steps))
     which_motor = len(motor["dir_pins"])
+    GPIO.output(RELAY_PIN, GPIO.HIGH)
+
     for x in range(1, nm_steps):
         if GPIO.event_detected(ENDSTOP_PIN) and which_motor < 2:
             direction = int(np.logical_not(direction))
@@ -73,6 +78,7 @@ def use_const(nm_steps, motor, sps, delays, high, low, direction):
 
         delay = 1 / sps
         delays.append(high_low_switching(delay, delays, motor, high, low))
+    GPIO.output(RELAY_PIN, GPIO.LOW)
     return delays
 
 
@@ -145,7 +151,7 @@ def test_motor(motor,
     if microstepping_resolution != 1:
         microstepping(microstepping_resolution, motor, nm_steps)
 
-    pins = list(itertools.chain.from_iterable([motor[key] for key in motor.keys()]))
+    pins = list(itertools.chain.from_iterable([motor[key] for key in motor.keys()])) + [RELAY_PIN]
 
     if initialize_pins:
         init_pins(pins,
