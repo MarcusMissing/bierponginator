@@ -145,7 +145,6 @@ def test_motor(motor,
                return_to_start=True,
                motor_kennlinien=None,
                microstepping_resolution=1):
-
     if motor_kennlinien is None:
         motor_kennlinien = ["const", "ramp_down"]
 
@@ -166,13 +165,14 @@ def test_motor(motor,
 
     if return_to_start:
         sleep(0.8)
-        test_motor(motor,
-                   int(np.logical_not(direction)),
-                   nm_steps,
-                   sps,
+        print("Reversing")
+        test_motor(motor=motor,
+                   direction=int(np.logical_not(direction)),
+                   nm_steps=nm_steps,
+                   sps=100,
                    initialize_pins=False,
                    return_to_start=False,
-                   motor_kennlinien="const",
+                   motor_kennlinien=["const"],
                    microstepping_resolution=1)
 
 
