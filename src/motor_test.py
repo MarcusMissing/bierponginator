@@ -183,11 +183,11 @@ def test_motor(motor,
 #            return_to_start=False,
 #            motor_kennlinien=["const"],
 #            microstepping_resolution=1)
-for _ in range(10):
+for _ in range(50):
     test_motor(motor=MOTOR_X,
                direction=CW,
                nm_steps=20,
-               sps=700,
+               sps=400,
                initialize_pins=True,
                return_to_start=True,
                motor_kennlinien=None,
