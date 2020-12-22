@@ -142,17 +142,21 @@ def test_endstop(pin):
 
     try:
         while True:
+
             if GPIO.input(pin) == 0:
-                test_motor(MOTOR_X,
-                           CW,
-                           10,
-                           400,
-                           return_to_start=True,
-                           ramp_func="const",
-                           microstepping_resolution=1)
-                print("open")
+                dir = 0
+                #print("open")
             else:
-                print("close")
+                dir = 1
+                #print("close")
+
+            test_motor(MOTOR_X,
+                       dir,
+                       50,
+                       100,
+                       return_to_start=True,
+                       ramp_func="const",
+                       microstepping_resolution=1)
     finally:
         GPIO.cleanup()
 
@@ -165,6 +169,6 @@ def test_endstop(pin):
 #            ramp_func="const",
 #            microstepping_resolution=1)
 
-test_endstop()
+test_endstop(22)
 
 GPIO.cleanup()
