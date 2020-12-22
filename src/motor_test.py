@@ -32,10 +32,11 @@ def init_pins(pins, motor, direction):
 
 
 def init_endstop_detect():
-    GPIO.setmode(GPIO.BCM)
+    GPIO.remove_event_detect(ENDSTOP_PIN)
+    # GPIO.setmode(GPIO.BCM)
     GPIO.setup(ENDSTOP_PIN, GPIO.IN)
     GPIO.add_event_detect(ENDSTOP_PIN, GPIO.RISING, bouncetime=800, callback=rising_edge_callback)
-    print("Initialized endstop pins {}".format(ENDSTOP_PIN))
+    print("Initialized endstop pin {}".format(ENDSTOP_PIN))
 
 
 def high_low_switching(delay, delays, motor, high, low):
@@ -79,7 +80,6 @@ def drive_motor(motor,
                 motor_kennlinien,
                 nm_steps,
                 sps):
-
     delays = []
     high = list(itertools.repeat(GPIO.HIGH, len(motor["motor_pins"])))
     low = list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"])))
@@ -91,7 +91,7 @@ def drive_motor(motor,
     elif "ramp_down" in motor_kennlinien:
         delays = use_ramp_down(motor, delays[-1], delays, high, low)
 
-    print("Used ramp values: {}".format(delays))
+    print("Used {} values: {}".format(str(motor_kennlinien),delays))
 
 
 def microstepping(microstepping_resolution,
@@ -124,10 +124,10 @@ def test_motor(motor,
                direction,
                nm_steps,
                sps,
+               initialize_pins=True,
                return_to_start=True,
                motor_kennlinien=None,
                microstepping_resolution=1):
-
     if motor_kennlinien is None:
         motor_kennlinien = ["const", "ramp_down"]
 
@@ -136,12 +136,13 @@ def test_motor(motor,
 
     pins = list(itertools.chain.from_iterable([motor[key] for key in motor.keys()]))
 
-    init_pins(pins,
-              motor,
-              direction)
+    if initialize_pins:
+        init_pins(pins,
+                  motor,
+                  direction)
 
-    if len(motor["dir_pins"]) < 2:
-        init_endstop_detect()
+        if len(motor["dir_pins"]) < 2:
+            init_endstop_detect()
 
     drive_motor(motor, motor_kennlinien, nm_steps, sps)
 
@@ -151,6 +152,7 @@ def test_motor(motor,
                    int(np.logical_not(direction)),
                    nm_steps,
                    sps,
+                   initialize_pins=False,
                    return_to_start=False,
                    motor_kennlinien="const",
                    microstepping_resolution=1)
@@ -178,13 +180,13 @@ def test_endstop(pin):
         GPIO.cleanup()
 
 
-test_motor(MOTOR_X,
-           CW,
-           50,
-           500,
-           return_to_start=True,
-           motor_kennlinien=None,
+test_motor(motor=MOTOR_X,
+           direction=CW,
+           nm_steps=50,
+           sps=500,
+           initialize_pins=True,
+           return_to_start=False,
+           motor_kennlinien=["const"],
            microstepping_resolution=1)
-
 
 GPIO.cleanup()
