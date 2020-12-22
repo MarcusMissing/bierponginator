@@ -171,11 +171,12 @@ test_motor(motor=MOTOR_X,
            motor_kennlinien=None,
            microstepping_resolution=1)
 
+GPIO.cleanup()
 test_motor(motor=MOTOR_X,
            direction=CCW,
            nm_steps=20,
            sps=400,
-           initialize_pins=False,
+           initialize_pins=True,
            motor_kennlinien=None,
            microstepping_resolution=1)
 GPIO.cleanup()
