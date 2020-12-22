@@ -21,6 +21,7 @@ CCW = 1
 
 global INITIALIZED
 
+
 def rising_edge_callback():
     print('This is a edge event callback function!')
     print('This is run in a different thread to your main program')
@@ -145,7 +146,6 @@ def test_motor(motor,
                initialize_pins=True,
                motor_kennlinien=None,
                microstepping_resolution=1):
-
     if motor_kennlinien is None:
         motor_kennlinien = ["const", "ramp_down"]
 
@@ -163,19 +163,29 @@ def test_motor(motor,
     drive_motor(motor, motor_kennlinien, nm_steps, sps, direction)
 
 
+test_motor(motor=MOTOR_Z,
+           direction=CW,
+           nm_steps=600,
+           sps=350,
+           initialize_pins=True,
+           motor_kennlinien=["const"],
+           microstepping_resolution=1)
+
+GPIO.cleanup()
 test_motor(motor=MOTOR_X,
            direction=CW,
-           nm_steps=20,
-           sps=400,
+           nm_steps=45,
+           sps=700,
            initialize_pins=True,
            motor_kennlinien=None,
            microstepping_resolution=1)
 
 GPIO.cleanup()
+sleep(0.4)
 test_motor(motor=MOTOR_X,
            direction=CCW,
-           nm_steps=20,
-           sps=400,
+           nm_steps=45,
+           sps=200,
            initialize_pins=True,
            motor_kennlinien=None,
            microstepping_resolution=1)
