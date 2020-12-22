@@ -164,7 +164,7 @@ def test_motor(motor,
 
 
 test_motor(motor=MOTOR_Z,
-           direction=CW,
+           direction=CCW,
            nm_steps=1000,
            sps=350,
            initialize_pins=True,
