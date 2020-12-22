@@ -13,8 +13,15 @@ MOTOR_X = {"dir_pins": [26, 12],
 
 MICROSTEP_RES_PINS = (14, 15, 18)
 
+ENDSTOP_PIN = 22
+
 CW = 0
 CCW = 1
+
+
+def rising_edge_callback():
+    print('This is a edge event callback function!')
+    print('This is run in a different thread to your main program')
 
 
 def init_pins(pins, motor, direction):
@@ -24,52 +31,67 @@ def init_pins(pins, motor, direction):
     print("initialized pins: {}".format(pins))
 
 
+def init_endstop_detect():
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(ENDSTOP_PIN, GPIO.IN)
+    GPIO.add_event_detect(ENDSTOP_PIN, GPIO.RISING, bouncetime=800, callback=rising_edge_callback)
+    print("Initialized endstop pins {}".format(ENDSTOP_PIN))
+
+
+def high_low_switching(delay, delays, motor, high, low):
+    delays.append(delay)
+    GPIO.output(motor["motor_pins"], high)
+    sleep(delay)
+    GPIO.output(motor["motor_pins"], low)
+    sleep(delay)
+    return delays
+
+
+def use_tanh(nm_steps, motor, sps, delays, high, low):
+    which_motor = len(motor["dir_pins"])
+    for x in range(1, nm_steps):
+        if GPIO.event_detected(ENDSTOP_PIN) and which_motor < 2:
+            GPIO.output(motor["dir_pins"], int(np.logical_not(dir)))
+
+        delay = (1 / sps) * 1 / (np.tanh(x * (1 / nm_steps)) + 0.2)
+        return high_low_switching(delay, delays, motor, high, low)
+
+
+def use_const(nm_steps, motor, sps, delays, high, low):
+    which_motor = len(motor["dir_pins"])
+    for x in range(1, nm_steps):
+        if GPIO.event_detected(ENDSTOP_PIN) and which_motor < 2:
+            GPIO.output(motor["dir_pins"], int(np.logical_not(dir)))
+
+        delay = 1 / sps
+        return high_low_switching(delay, delays, motor, high, low)
+
+
+def use_ramp_down(motor, delay, delays, high, low):
+    for j in range(1, 5):
+        delay = delay * j
+        if delay > 0.02:
+            delay = 0.02
+        return high_low_switching(delay, delays, motor, high, low)
+
+
 def drive_motor(motor,
-                ramp_func,
+                motor_kennlinien,
                 nm_steps,
                 sps):
-    assert ramp_func in ["exp", "tanh", "const"], "ramp functions available:exp,tanh,const"
+
     delays = []
     high = list(itertools.repeat(GPIO.HIGH, len(motor["motor_pins"])))
     low = list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"])))
 
-    if ramp_func == "exp":
-        for x in range(1, nm_steps):
-            delay = 1 / (sps * np.exp(1 / (nm_steps - x) - 1))
-            delays.append(delay)
-            GPIO.output(motor["motor_pins"], high)
-            sleep(delay)
-            GPIO.output(motor["motor_pins"], low)
-            sleep(delay)
+    if "const" in motor_kennlinien:
+        delays = use_const(nm_steps, motor, sps, delays, high, low)
+    elif "tanh" in motor_kennlinien:
+        delays = use_tanh(nm_steps, motor, sps, delays, high, low)
+    elif "ramp_down" in motor_kennlinien:
+        delays = use_ramp_down(motor, delays[-1], delays, high, low)
 
-    if ramp_func == "tanh":
-        for x in range(1, nm_steps):
-            delay = (1 / sps) * 1 / (np.tanh(x * (1 / nm_steps)) + 0.2)
-            delays.append(delay)
-            GPIO.output(motor["motor_pins"], high)
-            sleep(delay)
-            GPIO.output(motor["motor_pins"], low)
-            sleep(delay)
-    if ramp_func == "const":
-        for x in range(1, nm_steps):
-            delay = 1 / sps
-            delays.append(delay)
-            GPIO.output(motor["motor_pins"], high)
-            sleep(delay)
-            GPIO.output(motor["motor_pins"], low)
-            sleep(delay)
-
-    for j in range(1, 10):
-        delay = delay * j
-        if delay > 0.02:
-            delay = 0.02
-        delays.append(delay)
-        GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.HIGH, len(motor["motor_pins"]))))
-        sleep(delay)
-        GPIO.output(motor["motor_pins"], list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"]))))
-        sleep(delay)
-
-    return delays
+    print("Used ramp values: {}".format(delays))
 
 
 def microstepping(microstepping_resolution,
@@ -103,77 +125,66 @@ def test_motor(motor,
                nm_steps,
                sps,
                return_to_start=True,
-               ramp_func="const",
+               motor_kennlinien=None,
                microstepping_resolution=1):
-    print(motor,
-          direction,
-          nm_steps,
-          sps,
-          return_to_start,
-          ramp_func,
-          microstepping_resolution)
+
+    if motor_kennlinien is None:
+        motor_kennlinien = ["const", "ramp_down"]
 
     if microstepping_resolution != 1:
         microstepping(microstepping_resolution, motor, nm_steps)
 
     pins = list(itertools.chain.from_iterable([motor[key] for key in motor.keys()]))
+
     init_pins(pins,
               motor,
               direction)
 
-    delays = drive_motor(motor, ramp_func, nm_steps, sps)
-    print("Used ramp values: {}".format(delays))
+    if len(motor["dir_pins"]) < 2:
+        init_endstop_detect()
+
+    drive_motor(motor, motor_kennlinien, nm_steps, sps)
 
     if return_to_start:
-        print('returning')
         sleep(0.2)
         test_motor(motor,
                    int(np.logical_not(direction)),
                    nm_steps,
                    sps,
                    return_to_start=False,
-                   ramp_func="const",
+                   motor_kennlinien="const",
                    microstepping_resolution=1)
 
 
 def test_endstop(pin):
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(pin, GPIO.IN)
-    GPIO.add_event_detect(pin, GPIO.RISING, bouncetime=800)  # add rising edge detection on a channel
+    GPIO.add_event_detect(pin, GPIO.RISING, bouncetime=800,
+                          callback=rising_edge_callback)  # add rising edge detection on a channel
 
     try:
         dir = 0
         old = 0
         while True:
             status = GPIO.input(pin)
-
-            if GPIO.event_detected(pin) and status != old:
+            if GPIO.event_detected(pin):
                 print('Button pressed')
                 dir = int(np.logical_not(dir))
 
             # if status != 0 and not old:
             #     dir = int(np.logical_not(dir))
-
-            test_motor(MOTOR_Z,
-                       dir,
-                       300,
-                       350,
-                       return_to_start=False,
-                       ramp_func="const",
-                       microstepping_resolution=1)
-            old = status
+            # old = status
     finally:
         GPIO.cleanup()
 
 
-# test_motor(MOTOR_X,
-#            CW,
-#            50,
-#            500,
-#            return_to_start=True,
-#            ramp_func="const",
-#            microstepping_resolution=1)
+test_motor(MOTOR_X,
+           CW,
+           50,
+           500,
+           return_to_start=True,
+           motor_kennlinien=None,
+           microstepping_resolution=1)
 
-test_endstop(22)
 
 GPIO.cleanup()
