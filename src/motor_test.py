@@ -143,10 +143,9 @@ def test_motor(motor,
                nm_steps,
                sps,
                initialize_pins=True,
-               return_to_start=True,
                motor_kennlinien=None,
                microstepping_resolution=1):
-    dir_old = direction
+
     if motor_kennlinien is None:
         motor_kennlinien = ["const", "ramp_down"]
 
@@ -154,7 +153,6 @@ def test_motor(motor,
         microstepping(microstepping_resolution, motor, nm_steps)
 
     pins = list(itertools.chain.from_iterable([motor[key] for key in motor.keys()])) + [RELAY_PIN]
-    print(str(pins))
     if initialize_pins:
         init_pins(pins,
                   motor,
@@ -162,37 +160,22 @@ def test_motor(motor,
 
         if len(motor["dir_pins"]) < 2:
             init_endstop_detect()
-    print(str(direction))
     drive_motor(motor, motor_kennlinien, nm_steps, sps, direction)
-    print(str(direction))
-    if return_to_start:
-        sleep(0.8)
-        print("Reversing with direction {}".find(str(direction)))
-        test_motor(motor=motor,
-                   direction=int(np.logical_not(0)),
-                   nm_steps=nm_steps,
-                   sps=100,
-                   initialize_pins=False,
-                   return_to_start=False,
-                   motor_kennlinien=["const"],
-                   microstepping_resolution=1)
 
-
-# test_motor(motor=MOTOR_Z,
-#            direction=CCW,
-#            nm_steps=1000,
-#            sps=300,
-#            initialize_pins=True,
-#            return_to_start=False,
-#            motor_kennlinien=["const"],
-#            microstepping_resolution=1)
 
 test_motor(motor=MOTOR_X,
            direction=CW,
            nm_steps=20,
            sps=400,
            initialize_pins=True,
-           return_to_start=True,
+           motor_kennlinien=None,
+           microstepping_resolution=1)
+
+test_motor(motor=MOTOR_X,
+           direction=CCW,
+           nm_steps=20,
+           sps=400,
+           initialize_pins=False,
            motor_kennlinien=None,
            microstepping_resolution=1)
 GPIO.cleanup()
