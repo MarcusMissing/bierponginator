@@ -185,4 +185,5 @@ test_motor(motor=MOTOR_Z,
            motor_kennlinien=["const"],
            microstepping_resolution=1)
 
+
 GPIO.cleanup()
