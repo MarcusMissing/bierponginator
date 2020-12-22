@@ -64,7 +64,9 @@ def use_const(nm_steps, motor, sps, delays, high, low):
     print("Using Constant velocity with {} steps".format(nm_steps))
     which_motor = len(motor["dir_pins"])
     for x in range(1, nm_steps):
+        print(which_motor)
         if GPIO.event_detected(ENDSTOP_PIN) and which_motor < 2:
+            print("event detected")
             GPIO.output(motor["dir_pins"], int(np.logical_not(dir)))
 
         delay = 1 / sps
@@ -97,7 +99,7 @@ def drive_motor(motor,
     elif "ramp_down" in motor_kennlinien:
         delays = use_ramp_down(motor, delays[-1], delays, high, low)
 
-    print("Used {} values: {}".format(str(motor_kennlinien), delays))
+    #print("Used {} values: {}".format(str(motor_kennlinien), delays))
 
 
 def microstepping(microstepping_resolution,
