@@ -19,6 +19,7 @@ ENDSTOP_PIN = 22
 CW = 0
 CCW = 1
 
+global INITIALIZED
 
 def rising_edge_callback():
     print('This is a edge event callback function!')
@@ -184,18 +185,20 @@ def test_motor(motor,
 #            return_to_start=False,
 #            motor_kennlinien=["const"],
 #            microstepping_resolution=1)
+INITIALIZED = True
 for _ in range(50):
     test_motor(motor=MOTOR_X,
                direction=CW,
                nm_steps=20,
                sps=400,
-               initialize_pins=True,
+               initialize_pins=INITIALIZED,
                return_to_start=True,
                motor_kennlinien=None,
                microstepping_resolution=1)
-    sleep(0.8)
+    sleep(2)
     #
     GPIO.cleanup()
+    INITIALIZED = True
 
 
 GPIO.cleanup()
