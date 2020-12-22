@@ -194,5 +194,7 @@ for _ in range(50):
                motor_kennlinien=None,
                microstepping_resolution=1)
     sleep(0.8)
+    GPIO.cleanup()
+
 
 GPIO.cleanup()
