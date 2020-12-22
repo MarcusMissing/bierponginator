@@ -175,35 +175,14 @@ def test_motor(motor,
                    microstepping_resolution=1)
 
 
-def test_endstop(pin):
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(pin, GPIO.IN)
-    GPIO.add_event_detect(pin, GPIO.RISING, bouncetime=800,
-                          callback=rising_edge_callback)  # add rising edge detection on a channel
-
-    try:
-        dir = 0
-        old = 0
-        while True:
-            status = GPIO.input(pin)
-            if GPIO.event_detected(pin):
-                print('Button pressed')
-                dir = int(np.logical_not(dir))
-
-            # if status != 0 and not old:
-            #     dir = int(np.logical_not(dir))
-            # old = status
-    finally:
-        GPIO.cleanup()
-
 
 test_motor(motor=MOTOR_Z,
            direction=CCW,
-           nm_steps=10000,
+           nm_steps=1000,
            sps=400,
            initialize_pins=True,
            return_to_start=False,
            motor_kennlinien=["const"],
-           microstepping_resolution=2)
+           microstepping_resolution=1)
 
 GPIO.cleanup()
