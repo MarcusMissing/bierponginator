@@ -141,10 +141,11 @@ def test_endstop(pin):
     GPIO.setup(pin, GPIO.IN)
 
     try:
+        dir = 0
+        old = 0
         while True:
-            dir = 0
-
-            if GPIO.input(pin) != 0:
+            status = GPIO.input(pin)
+            if status != 0 and not old:
                 dir = int(np.logical_not(dir))
                 # print("close")
 
@@ -155,6 +156,7 @@ def test_endstop(pin):
                        return_to_start=False,
                        ramp_func="const",
                        microstepping_resolution=1)
+            old = status
     finally:
         GPIO.cleanup()
 
