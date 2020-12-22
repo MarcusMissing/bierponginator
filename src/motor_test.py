@@ -48,25 +48,26 @@ def high_low_switching(delay, delays, motor, high, low):
     return delays
 
 
-def use_tanh(nm_steps, motor, sps, delays, high, low):
+def use_tanh(nm_steps, motor, sps, delays, high, low, direction):
     print("Using Tanh velocity with {} steps ".format(nm_steps))
     which_motor = len(motor["dir_pins"])
     for x in range(1, nm_steps):
         if GPIO.event_detected(ENDSTOP_PIN) and which_motor < 2:
-            GPIO.output(motor["dir_pins"], int(np.logical_not(dir)))
+            print("Switching direction from {} to {}".format(direction, int(np.logical_not(direction))))
+            GPIO.output(motor["dir_pins"], int(np.logical_not(direction)))
 
         delay = (1 / sps) * 1 / (np.tanh(x * (1 / nm_steps)) + 0.2)
         delays.append(high_low_switching(delay, delays, motor, high, low))
     return delays
 
 
-def use_const(nm_steps, motor, sps, delays, high, low):
+def use_const(nm_steps, motor, sps, delays, high, low, direction):
     print("Using Constant velocity with {} steps".format(nm_steps))
     which_motor = len(motor["dir_pins"])
     for x in range(1, nm_steps):
         if GPIO.event_detected(ENDSTOP_PIN) and which_motor < 2:
-            print("event detected")
-            GPIO.output(motor["dir_pins"], int(np.logical_not(dir)))
+            print("Switching direction from {} to {}".format(direction, int(np.logical_not(direction))))
+            GPIO.output(motor["dir_pins"], int(np.logical_not(direction)))
 
         delay = 1 / sps
         delays.append(high_low_switching(delay, delays, motor, high, low))
@@ -86,19 +87,20 @@ def use_ramp_down(motor, delay, delays, high, low):
 def drive_motor(motor,
                 motor_kennlinien,
                 nm_steps,
-                sps):
+                sps,
+                direction):
     delays = []
     high = list(itertools.repeat(GPIO.HIGH, len(motor["motor_pins"])))
     low = list(itertools.repeat(GPIO.LOW, len(motor["motor_pins"])))
 
     if "const" in motor_kennlinien:
-        delays = use_const(nm_steps, motor, sps, delays, high, low)
+        delays = use_const(nm_steps, motor, sps, delays, high, low, direction)
     elif "tanh" in motor_kennlinien:
-        delays = use_tanh(nm_steps, motor, sps, delays, high, low)
+        delays = use_tanh(nm_steps, motor, sps, delays, high, low, direction)
     elif "ramp_down" in motor_kennlinien:
         delays = use_ramp_down(motor, delays[-1], delays, high, low)
 
-    #print("Used {} values: {}".format(str(motor_kennlinien), delays))
+    # print("Used {} values: {}".format(str(motor_kennlinien), delays))
 
 
 def microstepping(microstepping_resolution,
@@ -151,7 +153,7 @@ def test_motor(motor,
         if len(motor["dir_pins"]) < 2:
             init_endstop_detect()
 
-    drive_motor(motor, motor_kennlinien, nm_steps, sps)
+    drive_motor(motor, motor_kennlinien, nm_steps, sps, direction)
 
     if return_to_start:
         sleep(0.2)
