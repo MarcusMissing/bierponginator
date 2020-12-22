@@ -49,6 +49,7 @@ def high_low_switching(delay, delays, motor, high, low):
 
 
 def use_tanh(nm_steps, motor, sps, delays, high, low):
+    print("Using Tanh velocity with {} ".format(nm_steps))
     which_motor = len(motor["dir_pins"])
     for x in range(1, nm_steps):
         if GPIO.event_detected(ENDSTOP_PIN) and which_motor < 2:
@@ -59,6 +60,7 @@ def use_tanh(nm_steps, motor, sps, delays, high, low):
 
 
 def use_const(nm_steps, motor, sps, delays, high, low):
+    print("Using Constant velocity with {} ".format(nm_steps))
     which_motor = len(motor["dir_pins"])
     for x in range(1, nm_steps):
         if GPIO.event_detected(ENDSTOP_PIN) and which_motor < 2:
@@ -69,6 +71,7 @@ def use_const(nm_steps, motor, sps, delays, high, low):
 
 
 def use_ramp_down(motor, delay, delays, high, low):
+    print("Ramping down with initial delay {} ".format(delay))
     for j in range(1, 5):
         delay = delay * j
         if delay > 0.02:
@@ -180,7 +183,7 @@ def test_endstop(pin):
         GPIO.cleanup()
 
 
-test_motor(motor=MOTOR_X,
+test_motor(motor=MOTOR_Z,
            direction=CW,
            nm_steps=50,
            sps=500,
