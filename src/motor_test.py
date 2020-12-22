@@ -137,6 +137,7 @@ def test_motor(motor,
                return_to_start=True,
                motor_kennlinien=None,
                microstepping_resolution=1):
+
     if motor_kennlinien is None:
         motor_kennlinien = ["const", "ramp_down"]
 
