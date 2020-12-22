@@ -190,7 +190,8 @@ for _ in range(10):
                sps=700,
                initialize_pins=True,
                return_to_start=True,
-               motor_kennlinien=["const"],
+               motor_kennlinien=,
                microstepping_resolution=1)
+    sleep(0.5)
 
 GPIO.cleanup()
