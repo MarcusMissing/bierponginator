@@ -185,20 +185,13 @@ def test_motor(motor,
 #            return_to_start=False,
 #            motor_kennlinien=["const"],
 #            microstepping_resolution=1)
-INITIALIZED = True
-for _ in range(50):
-    test_motor(motor=MOTOR_X,
-               direction=CW,
-               nm_steps=20,
-               sps=400,
-               initialize_pins=INITIALIZED,
-               return_to_start=True,
-               motor_kennlinien=None,
-               microstepping_resolution=1)
-    sleep(2)
-    #
-    GPIO.cleanup()
-    INITIALIZED = True
 
-
+test_motor(motor=MOTOR_X,
+           direction=CW,
+           nm_steps=20,
+           sps=400,
+           initialize_pins=True,
+           return_to_start=True,
+           motor_kennlinien=None,
+           microstepping_resolution=1)
 GPIO.cleanup()
