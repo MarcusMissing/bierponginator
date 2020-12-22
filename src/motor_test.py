@@ -166,7 +166,7 @@ def test_motor(motor,
 
     if return_to_start:
         sleep(0.8)
-        print("Reversing")
+        print("Reversing with direction {}".find(direction))
         test_motor(motor=motor,
                    direction=int(np.logical_not(direction)),
                    nm_steps=nm_steps,
