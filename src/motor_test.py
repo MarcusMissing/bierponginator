@@ -49,25 +49,27 @@ def high_low_switching(delay, delays, motor, high, low):
 
 
 def use_tanh(nm_steps, motor, sps, delays, high, low):
-    print("Using Tanh velocity with {} ".format(nm_steps))
+    print("Using Tanh velocity with {} steps ".format(nm_steps))
     which_motor = len(motor["dir_pins"])
     for x in range(1, nm_steps):
         if GPIO.event_detected(ENDSTOP_PIN) and which_motor < 2:
             GPIO.output(motor["dir_pins"], int(np.logical_not(dir)))
 
         delay = (1 / sps) * 1 / (np.tanh(x * (1 / nm_steps)) + 0.2)
-        return high_low_switching(delay, delays, motor, high, low)
+        delays.append(high_low_switching(delay, delays, motor, high, low))
+    return delays
 
 
 def use_const(nm_steps, motor, sps, delays, high, low):
-    print("Using Constant velocity with {} ".format(nm_steps))
+    print("Using Constant velocity with {} steps".format(nm_steps))
     which_motor = len(motor["dir_pins"])
     for x in range(1, nm_steps):
         if GPIO.event_detected(ENDSTOP_PIN) and which_motor < 2:
             GPIO.output(motor["dir_pins"], int(np.logical_not(dir)))
 
         delay = 1 / sps
-        return high_low_switching(delay, delays, motor, high, low)
+        delays.append(high_low_switching(delay, delays, motor, high, low))
+    return delays
 
 
 def use_ramp_down(motor, delay, delays, high, low):
@@ -76,7 +78,8 @@ def use_ramp_down(motor, delay, delays, high, low):
         delay = delay * j
         if delay > 0.02:
             delay = 0.02
-        return high_low_switching(delay, delays, motor, high, low)
+        delays.append(high_low_switching(delay, delays, motor, high, low))
+    return delays
 
 
 def drive_motor(motor,
@@ -94,7 +97,7 @@ def drive_motor(motor,
     elif "ramp_down" in motor_kennlinien:
         delays = use_ramp_down(motor, delays[-1], delays, high, low)
 
-    print("Used {} values: {}".format(str(motor_kennlinien),delays))
+    print("Used {} values: {}".format(str(motor_kennlinien), delays))
 
 
 def microstepping(microstepping_resolution,
