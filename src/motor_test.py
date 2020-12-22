@@ -153,7 +153,7 @@ def test_motor(motor,
         microstepping(microstepping_resolution, motor, nm_steps)
 
     pins = list(itertools.chain.from_iterable([motor[key] for key in motor.keys()])) + [RELAY_PIN]
-
+    print(str(direction))
     if initialize_pins:
         init_pins(pins,
                   motor,
@@ -161,9 +161,9 @@ def test_motor(motor,
 
         if len(motor["dir_pins"]) < 2:
             init_endstop_detect()
-
+    print(str(direction))
     drive_motor(motor, motor_kennlinien, nm_steps, sps, direction)
-
+    print(str(direction))
     if return_to_start:
         sleep(0.8)
         print("Reversing with direction {}".find(str(direction)))
