@@ -85,6 +85,7 @@ class MenuPage(tk.Frame):
                 connection_established = True
                 print(server_name + " is UP")
 
+
                 self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.client_socket.connect((server_name, 9999))
 
